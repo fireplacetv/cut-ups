@@ -46,7 +46,6 @@
       </div>
 
       <div class="control-section">
-        <button id="cutBtn" class="btn btn-primary">Cut Up</button>
         <button id="useResultBtn" class="btn btn-secondary">Use Result</button>
       </div>
     </aside>
@@ -362,22 +361,11 @@ The dog ran in the park.</pre>
     const inputEl = document.getElementById('input');
     const outputEl = document.getElementById('output');
     const methodButtons = document.querySelectorAll('.btn-method');
-    const cutBtn = document.getElementById('cutBtn');
     const useResultBtn = document.getElementById('useResultBtn');
     const helpToggle = document.getElementById('helpToggle');
     const helpPanel = document.getElementById('helpPanel');
 
     let selectedMethod = 'quadrant';
-
-    methodButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        methodButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedMethod = btn.dataset.method;
-      });
-    });
-
-    methodButtons[0].classList.add('active');
 
     function performCutUp() {
       const text = inputEl.value;
@@ -389,7 +377,16 @@ The dog ran in the park.</pre>
       outputEl.textContent = result;
     }
 
-    cutBtn.addEventListener('click', performCutUp);
+    methodButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        methodButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedMethod = btn.dataset.method;
+        performCutUp();
+      });
+    });
+
+    methodButtons[0].classList.add('active');
 
     useResultBtn.addEventListener('click', () => {
       const text = outputEl.textContent;
