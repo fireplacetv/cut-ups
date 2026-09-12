@@ -46,6 +46,16 @@
       </div>
 
       <div class="control-section">
+        <label>Line width:</label>
+        <div class="width-buttons">
+          <button class="btn btn-width" data-width="40">40</button>
+          <button class="btn btn-width" data-width="60">60</button>
+          <button class="btn btn-width active" data-width="80">80</button>
+          <button class="btn btn-width" data-width="100">100</button>
+        </div>
+      </div>
+
+      <div class="control-section">
         <button id="useResultBtn" class="btn btn-secondary">Use Result</button>
       </div>
     </aside>
@@ -305,6 +315,33 @@ The dog ran in the park.</pre>
       }
     }
 
+    function smartWrap(text, width) {
+      if (!text || width <= 0) return text;
+
+      const lines = text.split('\n');
+      return lines.map(line => {
+        if (line.length <= width) return line;
+
+        const words = line.split(' ');
+        const wrappedLines = [];
+        let currentLine = '';
+
+        for (const word of words) {
+          if (currentLine.length === 0) {
+            currentLine = word;
+          } else if ((currentLine + ' ' + word).length <= width) {
+            currentLine += ' ' + word;
+          } else {
+            if (currentLine) wrappedLines.push(currentLine);
+            currentLine = word;
+          }
+        }
+
+        if (currentLine) wrappedLines.push(currentLine);
+        return wrappedLines.join('\n');
+      }).join('\n');
+    }
+
     function cutUp(text, method, options = {}) {
       const { pageWidth = 80 } = options;
 
@@ -361,11 +398,13 @@ The dog ran in the park.</pre>
     const inputEl = document.getElementById('input');
     const outputEl = document.getElementById('output');
     const methodButtons = document.querySelectorAll('.btn-method');
+    const widthButtons = document.querySelectorAll('.btn-width');
     const useResultBtn = document.getElementById('useResultBtn');
     const helpToggle = document.getElementById('helpToggle');
     const helpPanel = document.getElementById('helpPanel');
 
     let selectedMethod = 'quadrant';
+    let selectedWidth = 80;
 
     function performCutUp() {
       const text = inputEl.value;
@@ -373,8 +412,9 @@ The dog ran in the park.</pre>
         return;
       }
 
-      const result = cutUp(text, selectedMethod, { pageWidth: 80 });
-      outputEl.textContent = result;
+      const result = cutUp(text, selectedMethod, { pageWidth: selectedWidth });
+      const wrapped = smartWrap(result, selectedWidth);
+      outputEl.textContent = wrapped;
     }
 
     methodButtons.forEach(btn => {
@@ -382,6 +422,15 @@ The dog ran in the park.</pre>
         methodButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedMethod = btn.dataset.method;
+        performCutUp();
+      });
+    });
+
+    widthButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        widthButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedWidth = parseInt(btn.dataset.width);
         performCutUp();
       });
     });

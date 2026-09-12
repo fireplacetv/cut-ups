@@ -319,6 +319,35 @@ select:focus {
   font-weight: 700;
 }
 
+/* Width buttons */
+.width-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.btn-width {
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.btn-width:hover {
+  background: var(--bg-panel);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.btn-width.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  font-weight: 700;
+}
+
 .button-group {
   display: flex;
   gap: 8px;
