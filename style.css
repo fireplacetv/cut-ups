@@ -290,9 +290,39 @@ select:focus {
   transform: translateY(0);
 }
 
+/* Method buttons */
+.method-buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.btn-method {
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.btn-method:hover {
+  background: var(--bg-panel);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.btn-method.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  font-weight: 700;
+}
+
 .button-group {
   display: flex;
   gap: 8px;
+  flex-direction: column;
 }
 
 .button-group .btn {

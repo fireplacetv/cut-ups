@@ -35,22 +35,19 @@
 
     <aside class="controls-panel">
       <div class="control-section">
-        <label for="method">Choose technique:</label>
-        <select id="method">
-          <option value="quadrant">Quadrant Cut</option>
-          <option value="fold-in">Fold-In</option>
-          <option value="line-shuffle">Line Shuffle</option>
-          <option value="sentence-shuffle">Sentence Shuffle</option>
-          <option value="word-scramble">Word Scramble</option>
-        </select>
+        <label>Technique:</label>
+        <div class="method-buttons">
+          <button class="btn btn-method" data-method="quadrant">Quadrant</button>
+          <button class="btn btn-method" data-method="fold-in">Fold-In</button>
+          <button class="btn btn-method" data-method="line-shuffle">Lines</button>
+          <button class="btn btn-method" data-method="sentence-shuffle">Sentences</button>
+          <button class="btn btn-method" data-method="word-scramble">Words</button>
+        </div>
       </div>
 
       <div class="control-section">
-        <div class="button-group">
-          <button id="cutBtn" class="btn btn-primary">Generate</button>
-          <button id="cutOutputBtn" class="btn btn-secondary">Layer</button>
-        </div>
-        <button id="copyBtn" class="btn btn-copy">Copy Result</button>
+        <button id="cutBtn" class="btn btn-primary">Cut Up</button>
+        <button id="useResultBtn" class="btn btn-secondary">Use Result</button>
       </div>
     </aside>
   </main>
@@ -364,54 +361,42 @@ The dog ran in the park.</pre>
 
     const inputEl = document.getElementById('input');
     const outputEl = document.getElementById('output');
-    const methodEl = document.getElementById('method');
+    const methodButtons = document.querySelectorAll('.btn-method');
     const cutBtn = document.getElementById('cutBtn');
-    const cutOutputBtn = document.getElementById('cutOutputBtn');
-    const copyBtn = document.getElementById('copyBtn');
+    const useResultBtn = document.getElementById('useResultBtn');
     const helpToggle = document.getElementById('helpToggle');
     const helpPanel = document.getElementById('helpPanel');
 
+    let selectedMethod = 'quadrant';
+
+    methodButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        methodButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedMethod = btn.dataset.method;
+      });
+    });
+
+    methodButtons[0].classList.add('active');
+
     function performCutUp() {
       const text = inputEl.value;
-      const method = methodEl.value;
+      if (!text.trim()) {
+        return;
+      }
 
-      const result = cutUp(text, method, { pageWidth: 80 });
+      const result = cutUp(text, selectedMethod, { pageWidth: 80 });
       outputEl.textContent = result;
     }
 
-    methodEl.addEventListener('change', () => {
-      toggleSegmentControl();
-    });
-
     cutBtn.addEventListener('click', performCutUp);
 
-    cutOutputBtn.addEventListener('click', () => {
+    useResultBtn.addEventListener('click', () => {
       const text = outputEl.textContent;
       if (!text) {
-        alert('No output to cut up. Generate a cut-up first.');
         return;
       }
-      const method = methodEl.value;
-
-      const result = cutUp(text, method, { pageWidth: 80 });
-      outputEl.textContent = result;
-    });
-
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(outputEl.textContent);
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => {
-          copyBtn.textContent = originalText;
-        }, 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
-        copyBtn.textContent = 'Copy failed';
-        setTimeout(() => {
-          copyBtn.textContent = 'Copy Result';
-        }, 2000);
-      }
+      inputEl.value = text;
     });
 
     helpToggle.addEventListener('click', () => {
