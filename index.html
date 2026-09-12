@@ -34,8 +34,8 @@
     </div>
 
     <div id="segmentControl" style="display: none;">
-      <label for="segmentCount">Cut Size:</label>
-      <input type="number" id="segmentCount" min="2" max="20" value="4">
+      <label for="segmentCount">Page Width:</label>
+      <input type="number" id="segmentCount" min="20" max="200" value="80">
     </div>
 
     <div class="button-row">
@@ -54,18 +54,23 @@
     </p>
 
     <div class="method-help">
-      <h3>Quadrant Cut</h3>
+      <h3>Quadrant Cut (2D)</h3>
       <p>
-        <strong>How it works:</strong> Splits your text into N segments (default 4) and randomly shuffles their order.
-        This is the closest digital equivalent to Burroughs's physical cut-up method where he'd cut a page into quarters and rearrange them.
+        <strong>How it works:</strong> The true Burroughs method: wraps your text into a 2D grid, makes a horizontal cut through the middle and a vertical cut through the middle, creating 4 quadrants. Then randomly shuffles the 4 quadrants and reassembles them. This is faithful to Burroughs's original physical technique with scissors and tape.
       </p>
       <p><strong>Example:</strong></p>
       <div class="example">
-        <div><strong>Input (4 segments):</strong>
-          <pre>The cat sat | on the mat. | The dog ran | in the park.</pre>
+        <div><strong>Input (wrapped to ~40 char width):</strong>
+          <pre>The cat sat on the mat and
+slept all day long in the sun
+The dog ran in the park with
+friends and played fetch all day</pre>
         </div>
-        <div><strong>Output (shuffled):</strong>
-          <pre>in the park. | The cat sat | on the mat. | The dog ran</pre>
+        <div><strong>Output (quadrants rearranged):</strong>
+          <pre>friends and played fetch all day
+The dog ran in the park with
+The cat sat on the mat and
+slept all day long in the sun</pre>
         </div>
       </div>
     </div>
@@ -158,13 +163,13 @@ The dog ran in the park.</pre>
     <ul>
       <li><strong>Layer techniques:</strong> Use "Cut Up Output" to apply different methods sequentially. Word Scramble → Sentence Shuffle can create interesting effects.</li>
       <li><strong>Try different source texts:</strong> Poetry works well, but try prose, lists, or even mixed media (recipes, instructions, song lyrics).</li>
-      <li><strong>Adjust cut size:</strong> For Quadrant Cut, try 2, 3, 5, or more segments to see how it affects fragmentation.</li>
+      <li><strong>Adjust page width:</strong> For Quadrant Cut, try different widths (40, 60, 100 chars) to change where the vertical cut falls and create different effects.</li>
       <li><strong>Embrace chance:</strong> The unexpected juxtapositions are the point. Keep clicking to explore different cuts.</li>
     </ul>
   </div>
 
   <script>
-    function tokenize(text, unit, segmentCount = 4) {
+    function tokenize(text, unit, pageWidth = 80) {
       if (!text || !text.trim()) {
         return [];
       }
@@ -193,19 +198,62 @@ The dog ran in the park.</pre>
           return sentences.filter(s => s.length > 0);
         }
 
-        case 'segment': {
-          if (segmentCount < 2) return [text];
-          const chunkSize = Math.ceil(text.length / segmentCount);
-          const segments = [];
-          for (let i = 0; i < text.length; i += chunkSize) {
-            segments.push(text.slice(i, i + chunkSize));
-          }
-          return segments;
+        case 'quadrant2d': {
+          const lines = text.split('\n');
+          return { lines, pageWidth };
         }
 
         default:
           return [text];
       }
+    }
+
+    function quadrantCut2D(textData) {
+      const { lines, pageWidth } = textData;
+      if (lines.length < 2) return lines;
+
+      const midRow = Math.floor(lines.length / 2);
+      const topLines = lines.slice(0, midRow);
+      const bottomLines = lines.slice(midRow);
+
+      const topLeft = [];
+      const topRight = [];
+      const bottomLeft = [];
+      const bottomRight = [];
+
+      const midCol = Math.floor(pageWidth / 2);
+
+      for (const line of topLines) {
+        topLeft.push(line.slice(0, midCol));
+        topRight.push(line.slice(midCol));
+      }
+
+      for (const line of bottomLines) {
+        bottomLeft.push(line.slice(0, midCol));
+        bottomRight.push(line.slice(midCol));
+      }
+
+      const quadrants = [topLeft, topRight, bottomLeft, bottomRight];
+      const shuffled = shuffle(quadrants);
+
+      const result = [];
+      const maxLines = Math.max(...shuffled.map(q => q.length));
+
+      for (let i = 0; i < maxLines; i++) {
+        let row = '';
+        row += (shuffled[0][i] || '').padEnd(midCol);
+        row += (shuffled[1][i] || '').padEnd(midCol);
+        result.push(row);
+      }
+
+      for (let i = 0; i < maxLines; i++) {
+        let row = '';
+        row += (shuffled[2][i] || '').padEnd(midCol);
+        row += (shuffled[3][i] || '').padEnd(midCol);
+        result.push(row);
+      }
+
+      return result.join('\n');
     }
 
     function shuffle(chunks) {
@@ -253,17 +301,19 @@ The dog ran in the park.</pre>
     }
 
     function cutUp(text, method, options = {}) {
-      const { segmentCount = 4 } = options;
+      const { pageWidth = 80 } = options;
 
       if (!text || !text.trim()) {
         return text;
       }
 
+      if (method === 'quadrant') {
+        const textData = tokenize(text, 'quadrant2d', pageWidth);
+        return quadrantCut2D(textData);
+      }
+
       let unit;
       switch (method) {
-        case 'quadrant':
-          unit = 'segment';
-          break;
         case 'fold-in':
           unit = 'line';
           break;
@@ -280,9 +330,7 @@ The dog ran in the park.</pre>
           return text;
       }
 
-      let chunks = unit === 'segment'
-        ? tokenize(text, unit, segmentCount)
-        : tokenize(text, unit);
+      let chunks = tokenize(text, unit);
 
       if (chunks.length < 2) {
         return text;
@@ -290,9 +338,6 @@ The dog ran in the park.</pre>
 
       let result;
       switch (method) {
-        case 'quadrant':
-          result = shuffle(chunks);
-          break;
         case 'fold-in':
           result = foldIn(chunks);
           break;
@@ -326,9 +371,9 @@ The dog ran in the park.</pre>
     function performCutUp() {
       const text = inputEl.value;
       const method = methodEl.value;
-      const segmentCount = parseInt(segmentCountEl.value) || 4;
+      const pageWidth = parseInt(segmentCountEl.value) || 80;
 
-      const result = cutUp(text, method, { segmentCount });
+      const result = cutUp(text, method, { pageWidth });
       outputEl.textContent = result;
     }
 
@@ -345,9 +390,9 @@ The dog ran in the park.</pre>
         return;
       }
       const method = methodEl.value;
-      const segmentCount = parseInt(segmentCountEl.value) || 4;
+      const pageWidth = parseInt(segmentCountEl.value) || 80;
 
-      const result = cutUp(text, method, { segmentCount });
+      const result = cutUp(text, method, { pageWidth });
       outputEl.textContent = result;
     });
 
