@@ -1,4 +1,4 @@
-function tokenize(text, unit) {
+function tokenize(text, unit, segmentCount = 4) {
   if (!text || !text.trim()) {
     return [];
   }
@@ -10,25 +10,25 @@ function tokenize(text, unit) {
     case 'line':
       return text.split('\n');
 
-    case 'sentence':
+    case 'sentence': {
       const sentences = [];
       let current = '';
       for (let i = 0; i < text.length; i++) {
         current += text[i];
-        if (/[.!?]\s|[.!?]$/.test(current.slice(-2))) {
-          sentences.push(current);
+        if ((text[i] === '.' || text[i] === '!' || text[i] === '?') &&
+            (i === text.length - 1 || /\s/.test(text[i + 1]))) {
+          sentences.push(current.trim());
           current = '';
         }
       }
       if (current.trim()) {
-        sentences.push(current);
+        sentences.push(current.trim());
       }
-      return sentences.filter(s => s.trim().length > 0);
+      return sentences.filter(s => s.length > 0);
+    }
 
     case 'segment': {
-      const segmentCount = arguments[2] || 4;
       if (segmentCount < 2) return [text];
-
       const chunkSize = Math.ceil(text.length / segmentCount);
       const segments = [];
       for (let i = 0; i < text.length; i += chunkSize) {
@@ -82,7 +82,7 @@ function join(chunks, unit) {
     case 'line':
       return chunks.join('\n');
     case 'sentence':
-      return chunks.join(' ').replace(/\s+([.!?])/g, '$1');
+      return chunks.join(' ');
     case 'segment':
       return chunks.join('');
     default:
