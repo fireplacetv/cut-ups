@@ -127,3 +127,49 @@ button:active {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+.method-help {
+  margin: 20px 0;
+  padding: 15px;
+  background: white;
+  border-radius: 4px;
+  border-left: 3px solid #ccc;
+}
+
+.method-help h3 {
+  margin-top: 0;
+  color: #222;
+}
+
+.method-help p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.example {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .example {
+    grid-template-columns: 1fr;
+  }
+}
+
+.example div {
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 3px;
+  border: 1px solid #e0e0e0;
+}
+
+.example pre {
+  margin: 8px 0;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  line-height: 1.4;
+}
