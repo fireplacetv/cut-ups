@@ -39,7 +39,8 @@
     </div>
 
     <div class="button-row">
-      <button id="cutBtn">Cut Up</button>
+      <button id="cutBtn">Cut Up Input</button>
+      <button id="cutOutputBtn">Cut Up Output</button>
       <button id="copyBtn">Copy Result</button>
     </div>
   </div>
@@ -195,6 +196,7 @@
     const segmentCountEl = document.getElementById('segmentCount');
     const segmentControl = document.getElementById('segmentControl');
     const cutBtn = document.getElementById('cutBtn');
+    const cutOutputBtn = document.getElementById('cutOutputBtn');
     const copyBtn = document.getElementById('copyBtn');
 
     function toggleSegmentControl() {
@@ -215,6 +217,19 @@
     });
 
     cutBtn.addEventListener('click', performCutUp);
+
+    cutOutputBtn.addEventListener('click', () => {
+      const text = outputEl.textContent;
+      if (!text) {
+        alert('No output to cut up. Generate a cut-up first.');
+        return;
+      }
+      const method = methodEl.value;
+      const segmentCount = parseInt(segmentCountEl.value) || 4;
+
+      const result = cutUp(text, method, { segmentCount });
+      outputEl.textContent = result;
+    });
 
     copyBtn.addEventListener('click', async () => {
       try {
