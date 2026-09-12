@@ -7,40 +7,55 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Cut-Up Text Generator <button id="helpToggle" style="float: right; padding: 8px 16px; font-size: 0.9rem; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">Help</button></h1>
+  <header class="app-header">
+    <div class="header-content">
+      <div>
+        <h1>Cut-Up Text Generator</h1>
+        <p class="tagline">Apply Burroughs & Gysin techniques to your text</p>
+      </div>
+      <button id="helpToggle" class="help-btn" aria-label="Toggle help panel">
+        <span>?</span>
+        <span class="help-label">Help</span>
+      </button>
+    </div>
+  </header>
 
-  <div class="container">
-    <div class="panel">
-      <label for="input">Paste your text:</label>
-      <textarea id="input" placeholder="Enter or paste text here..."></textarea>
+  <main class="app-main">
+    <div class="workspace">
+      <div class="input-panel panel">
+        <label for="input">Your text:</label>
+        <textarea id="input" placeholder="Paste your source text here..."></textarea>
+      </div>
+
+      <div class="output-panel panel">
+        <label for="output">Cut-up result:</label>
+        <div id="output" class="output-area"></div>
+      </div>
     </div>
 
-    <div class="panel">
-      <label for="output">Cut-up result:</label>
-      <div id="output"></div>
-    </div>
-  </div>
+    <aside class="controls-panel">
+      <div class="control-section">
+        <label for="method">Choose technique:</label>
+        <select id="method">
+          <option value="quadrant">Quadrant Cut</option>
+          <option value="fold-in">Fold-In</option>
+          <option value="line-shuffle">Line Shuffle</option>
+          <option value="sentence-shuffle">Sentence Shuffle</option>
+          <option value="word-scramble">Word Scramble</option>
+        </select>
+      </div>
 
-  <div class="controls">
-    <div>
-      <label for="method">Method:</label>
-      <select id="method">
-        <option value="quadrant">Quadrant Cut</option>
-        <option value="fold-in">Fold-In</option>
-        <option value="line-shuffle">Line Shuffle</option>
-        <option value="sentence-shuffle">Sentence Shuffle</option>
-        <option value="word-scramble">Word Scramble</option>
-      </select>
-    </div>
+      <div class="control-section">
+        <div class="button-group">
+          <button id="cutBtn" class="btn btn-primary">Generate</button>
+          <button id="cutOutputBtn" class="btn btn-secondary">Layer</button>
+        </div>
+        <button id="copyBtn" class="btn btn-copy">Copy Result</button>
+      </div>
+    </aside>
+  </main>
 
-    <div class="button-row">
-      <button id="cutBtn">Cut Up Input</button>
-      <button id="cutOutputBtn">Cut Up Output</button>
-      <button id="copyBtn">Copy Result</button>
-    </div>
-  </div>
-
-  <div id="helpPanel" style="display: none; margin-top: 40px; padding: 20px; background: #f5f5f5; border-radius: 4px; border-left: 4px solid #333;">
+  <div id="helpPanel">
     <h2>About Cut-Up Techniques</h2>
     <p>
       The cut-up technique was pioneered by Brion Gysin and popularized by William S. Burroughs.
