@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cut-Up Text Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Cut-Up Text Generator</h1>
+
+  <div class="container">
+    <div class="panel">
+      <label for="input">Paste your text:</label>
+      <textarea id="input" placeholder="Enter or paste text here..."></textarea>
+    </div>
+
+    <div class="panel">
+      <label for="output">Cut-up result:</label>
+      <div id="output"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div>
+      <label for="method">Method:</label>
+      <select id="method">
+        <option value="quadrant">Quadrant Cut</option>
+        <option value="fold-in">Fold-In</option>
+        <option value="line-shuffle">Line Shuffle</option>
+        <option value="sentence-shuffle">Sentence Shuffle</option>
+        <option value="word-scramble">Word Scramble</option>
+      </select>
+    </div>
+
+    <div id="segmentControl" style="display: none;">
+      <label for="segmentCount">Cut Size:</label>
+      <input type="number" id="segmentCount" min="2" max="20" value="4">
+    </div>
+
+    <div class="button-row">
+      <button id="cutBtn">Cut Up</button>
+      <button id="copyBtn">Copy Result</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { cutUp } from './cutup.js';
+
+    const inputEl = document.getElementById('input');
+    const outputEl = document.getElementById('output');
+    const methodEl = document.getElementById('method');
+    const segmentCountEl = document.getElementById('segmentCount');
+    const segmentControl = document.getElementById('segmentControl');
+    const cutBtn = document.getElementById('cutBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function toggleSegmentControl() {
+      segmentControl.style.display = methodEl.value === 'quadrant' ? 'block' : 'none';
+    }
+
+    function performCutUp() {
+      const text = inputEl.value;
+      const method = methodEl.value;
+      const segmentCount = parseInt(segmentCountEl.value) || 4;
+
+      const result = cutUp(text, method, { segmentCount });
+      outputEl.textContent = result;
+    }
+
+    methodEl.addEventListener('change', () => {
+      toggleSegmentControl();
+    });
+
+    cutBtn.addEventListener('click', performCutUp);
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(outputEl.textContent);
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+        copyBtn.textContent = 'Copy failed';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Result';
+        }, 2000);
+      }
+    });
+
+    toggleSegmentControl();
+  </script>
+</body>
+</html>
