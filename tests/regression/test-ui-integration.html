@@ -173,8 +173,8 @@
 
     test('Width parameter does not affect word count', () => {
       const input = 'one two three four five';
-      const result40 = cutUp(input, 'word-scramble', { pageWidth: 40 });
-      const result100 = cutUp(input, 'word-scramble', { pageWidth: 100 });
+      const result40 = cutUp(input, 'word-scramble', { lineWidth: 40 });
+      const result100 = cutUp(input, 'word-scramble', { lineWidth: 100 });
       const words40 = countWords(result40);
       const words100 = countWords(result100);
       assert(words40 === words100, `Word count should not depend on width: ${words40} vs ${words100}`);
@@ -186,7 +186,7 @@
       const inputWords = countWords(input);
 
       methods.forEach(method => {
-        const result = cutUp(input, method, { segmentCount: 2 });
+        const result = cutUp(input, method, { lineWidth: 80 });
         const outputWords = countWords(result);
         assert(
           inputWords === outputWords,
