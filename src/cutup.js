@@ -190,4 +190,31 @@ function cutUp(text, method, options = {}) {
   return join(result, unit);
 }
 
-export { cutUp, tokenize };
+function smartWrap(text, width) {
+  if (!text || width <= 0) return text;
+
+  const lines = text.split('\n');
+  return lines.map(line => {
+    if (line.length <= width) return line;
+
+    const words = line.split(' ');
+    const wrappedLines = [];
+    let currentLine = '';
+
+    for (const word of words) {
+      if (currentLine.length === 0) {
+        currentLine = word;
+      } else if ((currentLine + ' ' + word).length <= width) {
+        currentLine += ' ' + word;
+      } else {
+        if (currentLine) wrappedLines.push(currentLine);
+        currentLine = word;
+      }
+    }
+
+    if (currentLine) wrappedLines.push(currentLine);
+    return wrappedLines.join('\n');
+  }).join('\n');
+}
+
+export { cutUp, tokenize, smartWrap };
