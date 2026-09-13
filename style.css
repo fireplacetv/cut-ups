@@ -228,6 +228,14 @@ textarea:focus {
   transform: translateY(0);
 }
 
+.method-icon {
+  width: 14px;
+  height: 14px;
+  display: inline;
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+
 /* Width slider */
 .width-slider {
   width: 120px;
