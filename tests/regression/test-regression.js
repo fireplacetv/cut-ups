@@ -1,4 +1,4 @@
-import { cutUp, tokenize, cleanWhitespace } from '../../src/cutup.js';
+import { cutUp, tokenize, cleanWhitespace, reassemble } from '../../src/cutup.js';
 
 // Each case exercises one method against the invariants documented in
 // CLAUDE.md ("Key Invariants"): word/sentence count preservation, and
@@ -223,12 +223,71 @@ function runCleanWhitespaceTests() {
   return failed === 0;
 }
 
-export { runRegressionTests, runCleanWhitespaceTests };
+// Guards against regressing the fix for reassemble()'s missing 'quadrant'
+// case, which previously fell through to the default `chunks.join('')` and
+// concatenated grid rows with no separator at all — losing every row break
+// and gluing words together wherever a row filled exactly to its padded
+// width. See tests below for the direct reassemble() check and an
+// integration check that cutUp('quadrant') produces real line breaks.
+const reassembleTestCases = [
+  {
+    name: 'reassemble joins quadrant rows with newlines',
+    check: () => {
+      const result = reassemble(['row1', 'row2', 'row3'], 'quadrant');
+      if (result !== 'row1\nrow2\nrow3') {
+        throw new Error(`Expected rows joined by newline, got: "${result}"`);
+      }
+    },
+  },
+  {
+    name: 'cutUp quadrant output contains line breaks',
+    check: () => {
+      const input = 'The quick brown fox\njumps over the lazy dog\nand runs away\ninto the forest at night';
+      const result = cutUp(input, 'quadrant', { lineWidth: 20 });
+      if (!result.includes('\n')) {
+        throw new Error(`Expected quadrant output to contain line breaks, got: "${result}"`);
+      }
+    },
+  },
+];
+
+/**
+ * Runs all reassembleTestCases and logs pass/fail per case plus a summary.
+ * @returns {boolean} True if every test case passed.
+ */
+function runReassembleTests() {
+  console.log('\n=== REASSEMBLE TESTS ===\n');
+
+  let passed = 0;
+  let failed = 0;
+
+  reassembleTestCases.forEach(test => {
+    try {
+      test.check();
+      console.log(`✓ PASS: ${test.name}`);
+      passed++;
+    } catch (err) {
+      console.log(`✗ FAIL: ${test.name}`);
+      console.log(`  Error: ${err.message}\n`);
+      failed++;
+    }
+  });
+
+  console.log(`\n=== SUMMARY ===`);
+  console.log(`Passed: ${passed}`);
+  console.log(`Failed: ${failed}`);
+  console.log(`Total: ${passed + failed}`);
+
+  return failed === 0;
+}
+
+export { runRegressionTests, runCleanWhitespaceTests, runReassembleTests };
 
 // Only auto-run when this file is executed directly (e.g. `node
 // test-regression.js`), not when imported by another test module.
 if (import.meta.url === `file://${process.argv[1]}`) {
   const regressionSuccess = runRegressionTests();
   const cleanWhitespaceSuccess = runCleanWhitespaceTests();
-  process.exit(regressionSuccess && cleanWhitespaceSuccess ? 0 : 1);
+  const reassembleSuccess = runReassembleTests();
+  process.exit(regressionSuccess && cleanWhitespaceSuccess && reassembleSuccess ? 0 : 1);
 }

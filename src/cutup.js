@@ -151,7 +151,7 @@ function foldIn(chunks) {
  * Joins chunks back into a single string using the separator appropriate
  * for the given unit (mirrors how tokenize() split them).
  * @param {string[]} chunks
- * @param {'word'|'line'|'sentence'|'segment'} unit
+ * @param {'word'|'line'|'sentence'|'quadrant'|'segment'} unit
  * @returns {string} Joined text; empty string for empty input.
  */
 function reassemble(chunks, unit) {
@@ -164,6 +164,9 @@ function reassemble(chunks, unit) {
       return chunks.join('\n');
     case 'sentence':
       return chunks.join(' ');
+    case 'quadrant':
+      // quadrantCut2D() returns one string per grid row; rows join like lines.
+      return chunks.join('\n');
     case 'segment':
       return chunks.join('');
     default:
