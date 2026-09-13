@@ -1,7 +1,7 @@
 # Generated test artifacts
-golden-masters.json
-golden-masters.json.baseline
-golden-masters.json.gz
+tests/regression/golden-masters.json
+tests/regression/golden-masters.json.baseline
+tests/regression/golden-masters.json.gz
 
 # IDE
 .vscode/

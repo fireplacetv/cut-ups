@@ -1,4 +1,4 @@
-import { cutUp } from './cutup.js';
+import { cutUp } from '../../src/cutup.js';
 import fs from 'fs';
 import path from 'path';
 

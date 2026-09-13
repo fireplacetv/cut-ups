@@ -1,4 +1,4 @@
-import { cutUp, tokenize } from './cutup.js';
+import { cutUp, tokenize } from '../../src/cutup.js';
 
 const testCases = [
   {
