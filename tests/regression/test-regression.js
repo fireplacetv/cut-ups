@@ -1,5 +1,10 @@
 import { cutUp, tokenize } from '../../src/cutup.js';
 
+// Each case exercises one method against the invariants documented in
+// CLAUDE.md ("Key Invariants"): word/sentence count preservation, and
+// exact-match behavior for empty/single-chunk input. `checksWordCount` and
+// `checksSentenceCount` opt a case into the corresponding invariant check
+// below; `expected` opts into an exact string match instead.
 const testCases = [
   {
     name: 'quadrant with standard text',
@@ -56,10 +61,18 @@ function countWords(text) {
   return text.split(/\s+/).filter(w => w.length > 0).length;
 }
 
+// Counts sentence terminators rather than reusing cutup.js's tokenize(),
+// so this check stays an independent verification of the sentence-shuffle
+// invariant instead of testing the implementation against itself.
 function countSentences(text) {
   return text.match(/[.!?]+/g)?.length || 0;
 }
 
+/**
+ * Runs all testCases against cutUp() and logs pass/fail per case plus a
+ * summary. Intended to be run directly via `node tests/regression/test-regression.js`.
+ * @returns {boolean} True if every test case passed.
+ */
 function runRegressionTests() {
   console.log('=== REGRESSION TESTS ===\n');
 
@@ -120,6 +133,8 @@ function runRegressionTests() {
 
 export { runRegressionTests };
 
+// Only auto-run when this file is executed directly (e.g. `node
+// test-regression.js`), not when imported by another test module.
 if (import.meta.url === `file://${process.argv[1]}`) {
   const success = runRegressionTests();
   process.exit(success ? 0 : 1);
