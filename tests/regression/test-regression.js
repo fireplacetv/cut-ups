@@ -5,7 +5,7 @@ const testCases = [
     name: 'quadrant with standard text',
     input: 'The quick brown fox\njumps over the lazy dog\nand runs away',
     method: 'quadrant',
-    options: { segmentCount: 2 },
+    options: { lineWidth: 80 },
     checksWordCount: true,
   },
   {

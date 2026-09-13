@@ -43,7 +43,7 @@ function shuffle(chunks) {
   return arr;
 }
 
-function quadrantCut2D(lines, pageWidth) {
+function quadrantCut2D(lines, lineWidth) {
   if (lines.length < 2) return lines;
 
   const midRow = Math.floor(lines.length / 2);
@@ -55,7 +55,7 @@ function quadrantCut2D(lines, pageWidth) {
   const bottomLeft = [];
   const bottomRight = [];
 
-  const midCol = Math.floor(pageWidth / 2);
+  const midCol = Math.floor(lineWidth / 2);
 
   for (const line of topLines) {
     topLeft.push(line.slice(0, midCol));
@@ -87,7 +87,7 @@ function quadrantCut2D(lines, pageWidth) {
     result.push(row);
   }
 
-  return result.join('\n');
+  return result;
 }
 
 function foldIn(chunks) {
@@ -126,47 +126,50 @@ function reassemble(chunks, unit) {
 }
 
 function cutUp(text, method, options = {}) {
-  const { pageWidth = DEFAULT_LINE_WIDTH } = options;
+  const { lineWidth = DEFAULT_LINE_WIDTH } = options;
 
   if (!text || !text.trim()) {
     return text;
   }
 
-  // Special handling for quadrant (2D grid-based)
-  if (method === 'quadrant') {
-    const lines = text.split('\n');
-    if (lines.length < 2) {
-      return text;
-    }
-    return quadrantCut2D(lines, pageWidth);
-  }
-
+  // Validate method
   const unit = METHOD_TO_UNIT[method];
   if (!unit) {
-    return text;
+    throw new Error(`Unknown method: ${method}`);
   }
 
-  let chunks = tokenize(text, unit);
+  let chunks;
 
-  if (chunks.length < 2) {
-    return text;
+  // Quadrant uses lines as its unit
+  if (method === 'quadrant') {
+    chunks = text.split('\n');
+    if (chunks.length < 2) {
+      return text;
+    }
+    chunks = quadrantCut2D(chunks, lineWidth);
+  } else {
+    chunks = tokenize(text, unit);
+    if (chunks.length < 2) {
+      return text;
+    }
+
+    let result;
+    switch (method) {
+      case 'fold-in':
+        result = foldIn(chunks);
+        break;
+      case 'line-shuffle':
+      case 'sentence-shuffle':
+      case 'word-scramble':
+        result = shuffle(chunks);
+        break;
+      default:
+        result = chunks;
+    }
+    chunks = result;
   }
 
-  let result;
-  switch (method) {
-    case 'fold-in':
-      result = foldIn(chunks);
-      break;
-    case 'line-shuffle':
-    case 'sentence-shuffle':
-    case 'word-scramble':
-      result = shuffle(chunks);
-      break;
-    default:
-      result = chunks;
-  }
-
-  return reassemble(result, unit);
+  return reassemble(chunks, unit);
 }
 
 function smartWrap(text, width) {
