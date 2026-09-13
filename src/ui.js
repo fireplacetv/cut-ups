@@ -29,6 +29,7 @@ export function initializeUI() {
   const widthValue = document.getElementById('widthValue');
   const wrapButton = document.getElementById('wrapButton');
   const cleanWhitespaceButton = document.getElementById('cleanWhitespaceButton');
+  const helpToggle = document.getElementById('helpToggle');
 
   // Initialize state
   const initialMethod = getSelectedMethod();
@@ -96,4 +97,8 @@ export function initializeUI() {
 
   wrapButton.addEventListener('click', performWrap);
   cleanWhitespaceButton.addEventListener('click', performCleanWhitespace);
+
+  helpToggle.addEventListener('click', () => {
+    window.location.href = 'help.html';
+  });
 }
