@@ -51,8 +51,51 @@ function shuffle(chunks) {
   return arr;
 }
 
-function quadrantCut(chunks) {
-  return shuffle(chunks);
+function quadrantCut2D(lines, pageWidth = 80) {
+  if (lines.length < 2) return lines;
+
+  const midRow = Math.floor(lines.length / 2);
+  const topLines = lines.slice(0, midRow);
+  const bottomLines = lines.slice(midRow);
+
+  const topLeft = [];
+  const topRight = [];
+  const bottomLeft = [];
+  const bottomRight = [];
+
+  const midCol = Math.floor(pageWidth / 2);
+
+  for (const line of topLines) {
+    topLeft.push(line.slice(0, midCol));
+    topRight.push(line.slice(midCol));
+  }
+
+  for (const line of bottomLines) {
+    bottomLeft.push(line.slice(0, midCol));
+    bottomRight.push(line.slice(midCol));
+  }
+
+  const quadrants = [topLeft, topRight, bottomLeft, bottomRight];
+  const shuffled = shuffle(quadrants);
+
+  const result = [];
+  const maxLines = Math.max(...shuffled.map(q => q.length));
+
+  for (let i = 0; i < maxLines; i++) {
+    let row = '';
+    row += (shuffled[0][i] || '').padEnd(midCol);
+    row += (shuffled[1][i] || '').padEnd(midCol);
+    result.push(row);
+  }
+
+  for (let i = 0; i < maxLines; i++) {
+    let row = '';
+    row += (shuffled[2][i] || '').padEnd(midCol);
+    row += (shuffled[3][i] || '').padEnd(midCol);
+    result.push(row);
+  }
+
+  return result.join('\n');
 }
 
 function foldIn(chunks) {
@@ -91,17 +134,23 @@ function join(chunks, unit) {
 }
 
 function cutUp(text, method, options = {}) {
-  const { segmentCount = 4 } = options;
+  const { pageWidth = 80 } = options;
 
   if (!text || !text.trim()) {
     return text;
   }
 
+  // Special handling for quadrant (2D grid-based)
+  if (method === 'quadrant') {
+    const lines = text.split('\n');
+    if (lines.length < 2) {
+      return text;
+    }
+    return quadrantCut2D(lines, pageWidth);
+  }
+
   let unit;
   switch (method) {
-    case 'quadrant':
-      unit = 'segment';
-      break;
     case 'fold-in':
       unit = 'line';
       break;
@@ -118,9 +167,7 @@ function cutUp(text, method, options = {}) {
       return text;
   }
 
-  let chunks = unit === 'segment'
-    ? tokenize(text, unit, segmentCount)
-    : tokenize(text, unit);
+  let chunks = tokenize(text, unit);
 
   if (chunks.length < 2) {
     return text;
@@ -128,9 +175,6 @@ function cutUp(text, method, options = {}) {
 
   let result;
   switch (method) {
-    case 'quadrant':
-      result = quadrantCut(chunks);
-      break;
     case 'fold-in':
       result = foldIn(chunks);
       break;
