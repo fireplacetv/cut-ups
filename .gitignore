@@ -12,3 +12,6 @@ tests/regression/golden-masters.json.gz
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude
+.claude
