@@ -326,6 +326,19 @@ textarea:focus {
   padding: 6px 10px;
 }
 
+.wikipedia-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.wikipedia-status {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 /* Help content page */
 .help-content {
   max-width: 1400px;
