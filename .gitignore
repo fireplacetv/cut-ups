@@ -1,0 +1,14 @@
+# Generated test artifacts
+golden-masters.json
+golden-masters.json.baseline
+golden-masters.json.gz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
