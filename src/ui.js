@@ -15,6 +15,7 @@ export function initializeUI() {
   const methodButtons = document.querySelectorAll('.btn-method');
   const widthSlider = document.getElementById('widthSlider');
   const widthValue = document.getElementById('widthValue');
+  const wrapButton = document.getElementById('wrapButton');
 
   // Initialize state
   const initialMethod = getSelectedMethod();
@@ -35,12 +36,19 @@ export function initializeUI() {
 
     try {
       const result = cutUp(text, getSelectedMethod(), { lineWidth: getSelectedWidth() });
-      // Apply smartWrap for consistent display with configured width
-      const wrapped = smartWrap(result, getSelectedWidth());
-      inputEl.value = wrapped;
+      inputEl.value = result;
     } catch (error) {
       console.error('Cut-up error:', error.message);
     }
+  }
+
+  function performWrap() {
+    const text = inputEl.value;
+    if (!text.trim()) {
+      return;
+    }
+
+    inputEl.value = smartWrap(text, getSelectedWidth());
   }
 
   methodButtons.forEach(btn => {
@@ -56,6 +64,7 @@ export function initializeUI() {
     const width = parseInt(widthSlider.value);
     setSelectedWidth(width);
     widthValue.textContent = width;
-    performCutUp();
   });
+
+  wrapButton.addEventListener('click', performWrap);
 }

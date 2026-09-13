@@ -42,7 +42,8 @@ Cuts your text into individual words and randomly shuffles them. The most chaoti
 ## Features
 
 - **Five cut-up methods** to choose from
-- **Adjustable line width** (40-120 characters) with smart text wrapping
+- **Adjustable line width** (40-120 characters) used for quadrant cuts and standalone text wrapping
+- **Standalone "Wrap Text" tool** to reflow text at the chosen width, independent of any cut-up method
 - **In-place editing** – results appear directly in the text area
 - **Visual icons** for each technique
 - **Help page** with detailed explanations and examples
@@ -55,8 +56,9 @@ Cuts your text into individual words and randomly shuffles them. The most chaoti
 1. **Visit the [live application](https://fireplacetv.github.io/cut-ups/)**
 2. **Paste your text** into the text area
 3. **Choose a technique** by clicking one of the method buttons
-4. **Adjust the line width** if desired (affects wrapping and quadrant cuts)
-5. **Repeat!** Each click of a button applies the technique again, creating new variations
+4. **Adjust the line width** if desired (affects quadrant cuts and the Wrap Text tool)
+5. **Click "Wrap Text"** any time to reflow the text at the current width, independently of the cut-up methods
+6. **Repeat!** Each click of a button applies the technique again, creating new variations
 
 ## Installation & Development
 
@@ -100,7 +102,7 @@ The application implements each cut-up algorithm in JavaScript:
 - **Tokenization**: Text is split into units (words, lines, sentences, or 2D grid)
 - **Shuffling**: Units are randomly rearranged using Fisher-Yates shuffle
 - **Reassembly**: Units are rejoined with appropriate delimiters
-- **Smart Wrapping**: Text is re-wrapped to the specified width after cutting
+- **Smart Wrapping**: A standalone tool that re-wraps text to the specified width on demand, independent of any cut-up method
 
 Each method produces different results on the same input, and running a method multiple times on its own output creates new variations.
 
