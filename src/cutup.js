@@ -1,5 +1,11 @@
 import { DEFAULT_LINE_WIDTH, METHOD_TO_UNIT } from './constants.js';
 
+/**
+ * Splits text into an array of chunks for a given unit.
+ * @param {string} text - Source text.
+ * @param {'word'|'line'|'sentence'} unit - Granularity to split on.
+ * @returns {string[]} Chunks in original order; empty array for empty/blank input.
+ */
 function tokenize(text, unit) {
   if (!text || !text.trim()) {
     return [];
@@ -13,6 +19,11 @@ function tokenize(text, unit) {
       return text.split('\n');
 
     case 'sentence': {
+      // Naive sentence detection: walk character-by-character and end a
+      // sentence at a terminator (. ! ?) that is followed by whitespace or
+      // end-of-string. This deliberately avoids a regex lookbehind so it
+      // handles abbreviations/decimals no better or worse than a simple
+      // split would — see "Better sentence detection" in low-priority TODOs.
       const sentences = [];
       let current = '';
       for (let i = 0; i < text.length; i++) {
@@ -34,6 +45,12 @@ function tokenize(text, unit) {
   }
 }
 
+/**
+ * Returns a new array containing the same chunks in random order
+ * (Fisher-Yates shuffle). Does not mutate the input array.
+ * @param {Array} chunks
+ * @returns {Array} Shuffled copy of chunks.
+ */
 function shuffle(chunks) {
   const arr = [...chunks];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -43,6 +60,21 @@ function shuffle(chunks) {
   return arr;
 }
 
+/**
+ * Splits text into four quadrants (top-left/top-right/bottom-left/bottom-right)
+ * by row and column midpoints, shuffles the quadrants, then reassembles them
+ * back into full-width rows.
+ *
+ * KNOWN ISSUE (tracked, intentionally left as-is per CLAUDE.md): when a
+ * quadrant has fewer lines than its counterpart, the missing rows are
+ * padded rather than preserved, which loses words. The regression suite
+ * exercises this to demonstrate the bug rather than to hide it — do not
+ * "fix" it here without updating the tests and CLAUDE.md.
+ *
+ * @param {string[]} lines - Text split into lines.
+ * @param {number} lineWidth - Character width used to find the column midpoint.
+ * @returns {string[]} Reassembled lines with quadrants shuffled.
+ */
 function quadrantCut2D(lines, lineWidth) {
   if (lines.length < 2) return lines;
 
@@ -90,6 +122,13 @@ function quadrantCut2D(lines, lineWidth) {
   return result;
 }
 
+/**
+ * Interleaves the first and second halves of chunks (Burroughs/Gysin
+ * "fold-in": first[0], second[0], first[1], second[1], ...). Preserves
+ * every chunk, just reorders them, so chunk count is always unchanged.
+ * @param {Array} chunks
+ * @returns {Array} Interleaved chunks; returned as-is if fewer than 2.
+ */
 function foldIn(chunks) {
   if (chunks.length < 2) return chunks;
 
@@ -108,6 +147,13 @@ function foldIn(chunks) {
   return result;
 }
 
+/**
+ * Joins chunks back into a single string using the separator appropriate
+ * for the given unit (mirrors how tokenize() split them).
+ * @param {string[]} chunks
+ * @param {'word'|'line'|'sentence'|'segment'} unit
+ * @returns {string} Joined text; empty string for empty input.
+ */
 function reassemble(chunks, unit) {
   if (chunks.length === 0) return '';
 
@@ -125,6 +171,17 @@ function reassemble(chunks, unit) {
   }
 }
 
+/**
+ * Applies a cut-up method to text: tokenizes into the method's unit,
+ * transforms the chunks (shuffle, fold-in, or 2D quadrant split), then
+ * reassembles into a string.
+ * @param {string} text - Source text.
+ * @param {'quadrant'|'fold-in'|'line-shuffle'|'sentence-shuffle'|'word-scramble'} method
+ * @param {{lineWidth?: number}} [options] - lineWidth is only used by 'quadrant'.
+ * @returns {string} Transformed text. Empty/blank input and single-chunk
+ *   input are returned unchanged (see "Key Invariants" in CLAUDE.md).
+ * @throws {Error} If method is not a recognized cut-up method.
+ */
 function cutUp(text, method, options = {}) {
   const { lineWidth = DEFAULT_LINE_WIDTH } = options;
 
@@ -172,6 +229,13 @@ function cutUp(text, method, options = {}) {
   return reassemble(chunks, unit);
 }
 
+/**
+ * Word-wraps each line of text to a maximum width without breaking words
+ * mid-word. Lines already within width are left untouched.
+ * @param {string} text
+ * @param {number} width - Max characters per output line.
+ * @returns {string} Re-wrapped text; returned as-is if width <= 0 or text is empty.
+ */
 function smartWrap(text, width) {
   if (!text || width <= 0) return text;
 

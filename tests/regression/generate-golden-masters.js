@@ -14,6 +14,14 @@ const testInputs = [
 
 const methods = ['quadrant', 'fold-in', 'line-shuffle', 'sentence-shuffle', 'word-scramble'];
 
+/**
+ * Turns raw input text into a filesystem/JSON-key-safe identifier for use
+ * as a golden-masters.json key (truncated, non-alphanumeric chars collapsed
+ * to underscores).
+ * @param {string} input
+ * @returns {string} Sanitized key; may be empty for blank input (caller
+ *   falls back to an index-based key in that case).
+ */
 function sanitizeInputKey(input) {
   return input
     .substring(0, 50)
@@ -23,6 +31,14 @@ function sanitizeInputKey(input) {
     .toLowerCase();
 }
 
+/**
+ * Runs every method against every test input and writes the results to
+ * golden-masters.json in the current working directory. Shuffle-based
+ * methods (including quadrant, which shuffles quadrant order) are run 3x
+ * per input since their output is non-deterministic, so a diff against a
+ * baseline should compare word counts/structure rather than exact strings.
+ * @returns {object} The generated golden masters, keyed by sanitized input.
+ */
 function generateGoldenMasters() {
   console.log('Generating golden masters for current implementation...\n');
 
@@ -63,6 +79,14 @@ function generateGoldenMasters() {
   return goldenMasters;
 }
 
+/**
+ * Checks that every generated run preserved word count relative to its
+ * input (the "Word count preserved" invariant from CLAUDE.md). Logs any
+ * mismatches found — this is expected to surface the known quadrant
+ * data-loss bug rather than a script error.
+ * @param {object} goldenMasters - Output of generateGoldenMasters().
+ * @returns {boolean} True if no word-count mismatches were found.
+ */
 function validateGoldenMasters(goldenMasters) {
   console.log('\n=== VALIDATION ===\n');
 
