@@ -61,9 +61,91 @@ function shuffle(chunks) {
 }
 
 /**
+ * Pre-processes text for quadrantCut2D() so its column cut (at
+ * Math.floor(lineWidth / 2)) never lands in the middle of a word, and so
+ * the fragments it produces never get glued together with no separator
+ * once quadrantCut2D() shuffles and reassembles them.
+ *
+ * Wraps to one less than half of lineWidth first — since smartWrap() never
+ * breaks a word, every resulting half-line already ends on a word boundary,
+ * and the reserved column guarantees a half-line that fits in one column
+ * (see below) is short enough that padding it out always adds at least one
+ * real space. Half-lines are then paired up two at a time: the left half of
+ * each pair is padded with spaces out to exactly halfWidth, the right half
+ * is appended directly after it, and a single guaranteed space is appended
+ * after that. Appending (rather than slicing to width) is what keeps the
+ * right half intact — quadrantCut2D()'s slice at midCol only ever cuts
+ * *before* it, at column halfWidth, never through it, no matter how long
+ * it is.
+ *
+ * The two guaranteed spaces (one after the left half, one at the very end
+ * of the line) are what make the result safe to shuffle. quadrantCut2D()
+ * slices each composed line into a left fragment (chars before halfWidth)
+ * and a right fragment (chars from halfWidth on, including the trailing
+ * space we appended), shuffles the four resulting quadrants as whole
+ * groups, and reassembles rows by directly concatenating whichever
+ * fragment lands in each position - so any left fragment can end up next
+ * to any right fragment from a *different* original row. Without a
+ * guaranteed trailing space on *both* fragment types, a right fragment at
+ * least halfWidth characters long (e.g. one holding an overlong word) would
+ * have nothing added by quadrantCut2D()'s own padEnd(midCol) if it landed
+ * in the first position of a reassembled row, and would glue directly onto
+ * whatever followed it (e.g. "epsilon" + "zeta" -> "epsilonzeta"). Because
+ * every composed line here always ends in a real space, every right
+ * fragment does too, so that can't happen; the left half's own guaranteed
+ * space (from the reserved column) covers the equivalent case for left
+ * fragments the same way.
+ *
+ * A half-line that is itself one word too long to fit in halfWidth can't be
+ * used as the *left* half of a pair — its own length would already carry
+ * past column halfWidth, so the cut would land inside it instead of before
+ * it. Such a half-line is used as a lone *right* half instead, paired with
+ * a blank left column, so it starts exactly at column halfWidth and — like
+ * any right half — is never cut into. The half-line that would have paired
+ * with it is carried over to pair with the next one instead, so nothing is
+ * dropped.
+ *
+ * @param {string} text - Source text.
+ * @param {number} lineWidth - Target full width that will be passed to quadrantCut2D.
+ * @returns {string[]} Composed full-width lines, ready for quadrantCut2D().
+ */
+function prepareQuadrantLines(text, lineWidth) {
+  const halfWidth = Math.floor(lineWidth / 2);
+  // One column shorter than halfWidth, so padEnd(halfWidth) below always has
+  // at least one space to add for any half-line that fits within it.
+  const contentWidth = Math.max(halfWidth - 1, 1);
+  const halfLines = smartWrap(text, contentWidth).split('\n');
+
+  const composed = [];
+  let i = 0;
+  while (i < halfLines.length) {
+    const left = halfLines[i];
+
+    if (left.length >= halfWidth) {
+      // A single word too long to fit left of the cut. Put it in the right
+      // slot instead (with a blank left) so it starts exactly at column
+      // halfWidth rather than straddling it, and try the next half-line
+      // again as a fresh left.
+      composed.push(''.padEnd(halfWidth) + left + ' ');
+      i += 1;
+    } else {
+      const right = halfLines[i + 1] || '';
+      composed.push(left.padEnd(halfWidth) + right + ' ');
+      i += 2;
+    }
+  }
+
+  return composed;
+}
+
+/**
  * Splits text into four quadrants (top-left/top-right/bottom-left/bottom-right)
  * by row and column midpoints, shuffles the quadrants, then reassembles them
  * back into full-width rows.
+ *
+ * Callers should pass lines produced by prepareQuadrantLines() rather than a
+ * plain smartWrap()+split('\n'), so the column cut at midCol lands on a word
+ * boundary instead of splitting a word (see prepareQuadrantLines() for how).
  *
  * KNOWN ISSUE (tracked, intentionally left as-is per CLAUDE.md): when a
  * quadrant has fewer lines than its counterpart, the missing rows are
@@ -71,7 +153,7 @@ function shuffle(chunks) {
  * exercises this to demonstrate the bug rather than to hide it — do not
  * "fix" it here without updating the tests and CLAUDE.md.
  *
- * @param {string[]} lines - Text split into lines.
+ * @param {string[]} lines - Text split into lines (see prepareQuadrantLines()).
  * @param {number} lineWidth - Character width used to find the column midpoint.
  * @returns {string[]} Reassembled lines with quadrants shuffled.
  */
@@ -181,9 +263,8 @@ function reassemble(chunks, unit) {
  * @param {string} text - Source text.
  * @param {'quadrant'|'fold-in'|'line-shuffle'|'sentence-shuffle'|'word-scramble'} method
  * @param {{lineWidth?: number}} [options] - lineWidth is only used by 'quadrant',
- *   which wraps text to this width internally before splitting it into a 2D
- *   grid (quadrantCut2D's column midpoint is only meaningful once lines are
- *   uniformly wrapped to lineWidth).
+ *   which uses it (via prepareQuadrantLines()) to build lines whose column
+ *   midpoint always falls on a word boundary before splitting into a 2D grid.
  * @returns {string} Transformed text. Empty/blank input and single-chunk
  *   input are returned unchanged (see "Key Invariants" in CLAUDE.md).
  * @throws {Error} If method is not a recognized cut-up method.
@@ -203,10 +284,10 @@ function cutUp(text, method, options = {}) {
 
   let chunks;
 
-  // Quadrant uses lines as its unit, and needs them wrapped to lineWidth
-  // first so its column midpoint corresponds to an actual visual midpoint.
+  // Quadrant uses lines as its unit, and needs them pre-processed so its
+  // column midpoint always falls on a word boundary (see prepareQuadrantLines()).
   if (method === 'quadrant') {
-    chunks = smartWrap(text, lineWidth).split('\n');
+    chunks = prepareQuadrantLines(text, lineWidth);
     if (chunks.length < 2) {
       return text;
     }
