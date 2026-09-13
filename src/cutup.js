@@ -177,7 +177,10 @@ function reassemble(chunks, unit) {
  * reassembles into a string.
  * @param {string} text - Source text.
  * @param {'quadrant'|'fold-in'|'line-shuffle'|'sentence-shuffle'|'word-scramble'} method
- * @param {{lineWidth?: number}} [options] - lineWidth is only used by 'quadrant'.
+ * @param {{lineWidth?: number}} [options] - lineWidth is only used by 'quadrant',
+ *   which wraps text to this width internally before splitting it into a 2D
+ *   grid (quadrantCut2D's column midpoint is only meaningful once lines are
+ *   uniformly wrapped to lineWidth).
  * @returns {string} Transformed text. Empty/blank input and single-chunk
  *   input are returned unchanged (see "Key Invariants" in CLAUDE.md).
  * @throws {Error} If method is not a recognized cut-up method.
@@ -197,9 +200,10 @@ function cutUp(text, method, options = {}) {
 
   let chunks;
 
-  // Quadrant uses lines as its unit
+  // Quadrant uses lines as its unit, and needs them wrapped to lineWidth
+  // first so its column midpoint corresponds to an actual visual midpoint.
   if (method === 'quadrant') {
-    chunks = text.split('\n');
+    chunks = smartWrap(text, lineWidth).split('\n');
     if (chunks.length < 2) {
       return text;
     }
