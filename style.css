@@ -98,6 +98,7 @@ body {
   gap: 20px;
   flex: 1;
   overflow-y: auto;
+  order: 2;
 }
 
 /* Panels */
@@ -120,11 +121,6 @@ body {
 }
 
 .input-panel {
-  flex-shrink: 0;
-  max-height: 160px;
-}
-
-.output-panel {
   flex: 1;
   min-height: 300px;
 }
@@ -149,22 +145,6 @@ textarea:focus {
   border-color: var(--primary);
   background: white;
   box-shadow: 0 0 0 3px var(--primary-light);
-}
-
-/* Output area */
-.output-area {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 0.9rem;
-  background: #fafbfc;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--text);
-  line-height: 1.6;
 }
 
 /* Controls panel */
