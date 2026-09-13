@@ -24,6 +24,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
 }
 
 /* Header */
@@ -372,16 +373,6 @@ textarea:focus {
   margin: 12px 0;
 }
 
-@media (max-width: 768px) {
-  .example {
-    grid-template-columns: 1fr;
-  }
-
-  .method-buttons {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 .example div {
   background: white;
   padding: 12px;
@@ -424,6 +415,10 @@ textarea:focus {
 }
 
 @media (max-width: 768px) {
+  .example {
+    grid-template-columns: 1fr;
+  }
+
   .app-header h1 {
     font-size: 1.5rem;
   }
@@ -432,23 +427,46 @@ textarea:focus {
     flex-direction: column;
   }
 
-  .method-buttons {
-    grid-template-columns: 1fr;
+  .help-btn {
+    justify-content: center;
+    min-height: 44px;
   }
 
   .controls-panel {
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-method {
+    flex: 1 1 calc(50% - 4px);
+    min-height: 44px;
+    padding: 10px 8px;
+    font-size: 0.85rem;
   }
 
   .controls-panel .control-section:last-child {
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .width-group {
     flex-wrap: wrap;
   }
 
+  .width-slider {
+    width: 100%;
+  }
+
+  .btn-secondary {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  textarea {
+    font-size: 16px;
+  }
+
   .input-panel {
-    max-height: 120px;
+    min-height: 200px;
   }
 }
