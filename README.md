@@ -143,13 +143,13 @@ Comprehensive multi-layer testing ensures code safety:
 
 ### Known Issues
 
-- **Quadrant method**: The cut column can currently fall in the middle of a word, splitting it.
-  Planned fix: pre-wrap the text to half the target line width so every line already ends on a
-  word boundary, pair up consecutive lines, and pad/join each pair so the cut always lands
-  between words instead of inside one (see CLAUDE.md for the detailed algorithm). This fix does
-  not clean up the padding whitespace it introduces - use the "Wrap Text" tool afterward if you
-  want a tidier result. A separate issue - uneven line counts between the top and bottom halves
-  causing dropped words - is not addressed by this fix and remains open.
+- **Quadrant method**: The cut column used to be able to fall in the middle of a word, splitting
+  it. This is now fixed - text is pre-wrapped to half the target line width so every line already
+  ends on a word boundary, then consecutive lines are paired and padded/joined so the cut always
+  lands between words instead of inside one (see CLAUDE.md for the detailed algorithm). This fix
+  does not clean up the padding whitespace it introduces - use the "Wrap Text" tool afterward if
+  you want a tidier result. A separate issue - uneven line counts between the top and bottom
+  halves causing dropped words - is not addressed by this fix and remains open.
 
 ## Inspiration & Credits
 

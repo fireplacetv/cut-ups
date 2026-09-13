@@ -281,7 +281,92 @@ function runReassembleTests() {
   return failed === 0;
 }
 
-export { runRegressionTests, runCleanWhitespaceTests, runReassembleTests };
+// Guards against regressing the prepareQuadrantLines() fix for quadrant's
+// word-splitting bug: quadrantCut2D() cuts each line at a fixed character
+// column, which used to frequently land in the middle of a word (or, in an
+// earlier version of the fix, glue two adjacent words together with no
+// separator when a half-line filled exactly to its wrap width). Each case
+// runs cutUp('quadrant') many times across a spread of widths and asserts
+// every whitespace-separated token in the output is one of the known
+// vocabulary words - a corrupted (split or glued) token won't match any of
+// them. The vocabulary words are chosen so no two can concatenate into a
+// third: this is not an exhaustive check, but exact-match golden strings
+// aren't possible since quadrantCut2D()'s quadrant shuffle is randomized.
+const QUADRANT_VOCAB = [
+  'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta',
+  'iota', 'kappa', 'lambda', 'sigma', 'omega', 'quokka', 'narwhal',
+];
+
+function randomQuadrantText(wordCount) {
+  const words = [];
+  for (let i = 0; i < wordCount; i++) {
+    words.push(QUADRANT_VOCAB[Math.floor(Math.random() * QUADRANT_VOCAB.length)]);
+  }
+  return words.join(' ');
+}
+
+const quadrantWordIntegrityTestCases = [
+  {
+    name: 'quadrant never splits or glues words across a spread of widths',
+    check: () => {
+      const vocabSet = new Set(QUADRANT_VOCAB);
+      const widths = [10, 15, 20, 24, 31, 40, 55, 80];
+
+      for (const lineWidth of widths) {
+        for (let trial = 0; trial < 5; trial++) {
+          const input = randomQuadrantText(20 + trial * 3);
+          const result = cutUp(input, 'quadrant', { lineWidth });
+          const tokens = result.split(/\s+/).filter(t => t.length > 0);
+
+          for (const token of tokens) {
+            if (!vocabSet.has(token)) {
+              throw new Error(
+                `lineWidth ${lineWidth}: corrupted token "${token}" in output "${result}" for input "${input}"`
+              );
+            }
+          }
+        }
+      }
+    },
+  },
+];
+
+/**
+ * Runs all quadrantWordIntegrityTestCases and logs pass/fail per case plus a summary.
+ * @returns {boolean} True if every test case passed.
+ */
+function runQuadrantWordIntegrityTests() {
+  console.log('\n=== QUADRANT WORD INTEGRITY TESTS ===\n');
+
+  let passed = 0;
+  let failed = 0;
+
+  quadrantWordIntegrityTestCases.forEach(test => {
+    try {
+      test.check();
+      console.log(`✓ PASS: ${test.name}`);
+      passed++;
+    } catch (err) {
+      console.log(`✗ FAIL: ${test.name}`);
+      console.log(`  Error: ${err.message}\n`);
+      failed++;
+    }
+  });
+
+  console.log(`\n=== SUMMARY ===`);
+  console.log(`Passed: ${passed}`);
+  console.log(`Failed: ${failed}`);
+  console.log(`Total: ${passed + failed}`);
+
+  return failed === 0;
+}
+
+export {
+  runRegressionTests,
+  runCleanWhitespaceTests,
+  runReassembleTests,
+  runQuadrantWordIntegrityTests,
+};
 
 // Only auto-run when this file is executed directly (e.g. `node
 // test-regression.js`), not when imported by another test module.
@@ -289,5 +374,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const regressionSuccess = runRegressionTests();
   const cleanWhitespaceSuccess = runCleanWhitespaceTests();
   const reassembleSuccess = runReassembleTests();
-  process.exit(regressionSuccess && cleanWhitespaceSuccess && reassembleSuccess ? 0 : 1);
+  const quadrantWordIntegritySuccess = runQuadrantWordIntegrityTests();
+  process.exit(
+    regressionSuccess && cleanWhitespaceSuccess && reassembleSuccess && quadrantWordIntegritySuccess
+      ? 0
+      : 1
+  );
 }
