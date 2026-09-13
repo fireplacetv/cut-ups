@@ -86,8 +86,39 @@ Violation of these = bug.
 
 ### Known Issues to Preserve
 
-- **Quadrant method data loss** - Currently loses words (to be fixed, tracked in issue)
-- Test framework intentionally catches this bug to demonstrate value
+- **Quadrant method word-splitting** - `quadrantCut2D()` slices each wrapped line at a fixed
+  character column (`midCol = Math.floor(lineWidth / 2)`), which frequently falls in the middle
+  of a word rather than between words, corrupting the word there.
+
+  **Planned fix (not yet implemented):** pre-process lines before calling `quadrantCut2D()`,
+  replacing the current `smartWrap(text, lineWidth).split('\n')` step, as follows:
+  1. Let `halfWidth = Math.floor(lineWidth / 2)`. Wrap the text with `smartWrap(text, halfWidth)`
+     and split into "half-lines" - since `smartWrap` never breaks a word, every half-line already
+     ends on a word boundary.
+  2. Pair up half-lines two at a time (`half[0]`+`half[1]`, `half[2]`+`half[3]`, ...); if the count
+     is odd, pair the last half-line with an empty string.
+  3. For each pair `(left, right)`, compose a full line as `left.padEnd(halfWidth) + right`. The
+     `padEnd` pushes `right` to start at exactly column `halfWidth`, using spaces as filler - it
+     never truncates or splits a word.
+  4. Pass the composed lines into the existing `quadrantCut2D(lines, lineWidth)` unchanged. Since
+     `midCol` equals `halfWidth` by construction, the slice at `midCol` always falls exactly on
+     the boundary between the padded `left` half and the intact `right` half - never inside a word.
+
+  This intentionally does **not** include a whitespace cleanup pass afterward - the padding
+  spaces from step 3 and any ragged gaps introduced by the quadrant shuffle are left in the
+  output as-is. Run `cleanWhitespace()` (or the "Wrap Text" tool) manually afterward if a
+  cleaner-looking result is wanted; it is not applied automatically as part of this fix.
+
+  Edge case: a single word longer than `halfWidth` is still emitted whole by `smartWrap` (it is
+  never truncated), so `padEnd` becomes a no-op for that row and its column alignment with
+  neighboring rows shifts slightly - no word is split, but the grid is not perfectly rectangular
+  for that row.
+
+- **Quadrant method row-count mismatch** - a separate, still-open issue: when the top and bottom
+  halves end up with different numbers of lines, `quadrantCut2D()` pads the shorter side with
+  blank rows rather than preserving the extra lines from the longer side, which can still drop
+  words. The half-wrap/pairing fix above does not address this; it only fixes mid-word slicing.
+- Test framework intentionally catches these bugs to demonstrate value
 
 ### High-Priority Refactoring
 
