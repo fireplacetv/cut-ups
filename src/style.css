@@ -205,18 +205,10 @@ textarea:focus {
 }
 
 .btn-method:active {
-  transform: translateY(0);
-}
-
-.btn-method.active {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
-}
-
-.btn-method.active:hover {
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
+  transform: translateY(0);
 }
 
 .method-icon {
