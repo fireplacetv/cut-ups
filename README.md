@@ -1,51 +1,74 @@
 # Cut-Up Text Generator
 
-A web-based tool for applying Burroughs & Gysin cut-up techniques to text. Transform your writing using five different algorithmic methods.
+A web-based tool that applies surrealist literary cut-up techniques to your text. Inspired by the pioneering work of **Brion Gysin** and popularized by **William S. Burroughs**.
+
+🚀 **[Try it live on GitHub Pages](https://fireplacetv.github.io/cut-ups/)**
+
+## What is the Cut-Up Technique?
+
+The cut-up technique is a literary and visual art method where text is physically or digitally cut into pieces and rearranged to create new, often surreal, combinations. Rather than being a random scramble, it's a deliberate method of discovering unexpected connections and meanings within language.
+
+Brion Gysin, an American painter and writer, pioneered the technique in the 1950s. William S. Burroughs adopted and popularized it, using it as a core element of his literary practice. He believed cut-ups could reveal hidden meanings and bypass the logical mind.
+
+This web application brings these analog techniques into the digital age, allowing you to apply various cut-up methods to any text.
+
+## Available Techniques
+
+### Quadrant Cut (2D)
+The closest digital recreation of the original Burroughs method. Your text is wrapped into a 2D grid, divided by a horizontal and vertical line through the middle (creating 4 quadrants), then the quadrants are randomly shuffled and reassembled.
+
+**When to use:** For a faithful reproduction of the physical cut-up process that captures the true randomness and structural disruption Burroughs employed.
+
+### Fold-In
+Based on Brion Gysin's original fold-in technique. The text is split in half by lines, then lines from the first half and second half are interleaved (alternated), mimicking the effect of folding a page in half and reading across the seam.
+
+**When to use:** For a gentler disruption that maintains line structure while creating unexpected juxtapositions.
+
+### Line Shuffle
+Cuts your text into individual lines and randomly shuffles them. Destroys paragraph structure while keeping each line intact.
+
+**When to use:** For quick, playful rearrangements that work well with poetry or short passages.
+
+### Sentence Shuffle
+Cuts your text into sentences and randomly shuffles them. Creates new narrative possibilities while maintaining grammatical coherence.
+
+**When to use:** For exploring different story structures and narrative flows within your text.
+
+### Word Scramble
+Cuts your text into individual words and randomly shuffles them. The most chaotic technique—perfect for abstract, surrealist results.
+
+**When to use:** For maximum disruption and abstract linguistic exploration.
 
 ## Features
 
-- **5 Text Transformation Methods:**
-  - Quadrant Cut - Wraps text into a 2D grid and shuffles the 4 quadrants
-  - Fold-In - Splits text by lines and interleaves them together
-  - Line Shuffle - Cuts text into lines and randomly shuffles them
-  - Sentence Shuffle - Cuts text into sentences and randomly shuffles them
-  - Word Scramble - Cuts text into words and randomly shuffles them
+- **Five cut-up methods** to choose from
+- **Adjustable line width** (40-120 characters) with smart text wrapping
+- **In-place editing** – results appear directly in the text area
+- **Visual icons** for each technique
+- **Help page** with detailed explanations and examples
+- **No installation needed** – runs entirely in your browser
+- **Responsive design** – works on desktop and mobile
+- **Comprehensive testing framework** – ensures quality and enables safe refactoring
 
-- **Interactive UI** - Paste text, choose a method, get immediate results
-- **Adjustable Line Width** - Set the display width from 40 to 120 characters
-- **Iterative Cutting** - Apply cut-up operations repeatedly to refine results
+## How to Use
 
-## Quick Start
+1. **Visit the [live application](https://fireplacetv.github.io/cut-ups/)**
+2. **Paste your text** into the text area
+3. **Choose a technique** by clicking one of the method buttons
+4. **Adjust the line width** if desired (affects wrapping and quadrant cuts)
+5. **Repeat!** Each click of a button applies the technique again, creating new variations
 
-### Running the App
+## Installation & Development
 
-Open `src/index.html` in your web browser or serve via HTTP:
-
-```bash
-# Option 1: Direct open
-open src/index.html
-
-# Option 2: Local web server
-python -m http.server 8000
-# Then visit http://localhost:8000/src/index.html
-```
-
-### Testing
-
-Comprehensive testing framework included to ensure behavior is preserved during refactoring:
+If you want to run this locally or contribute:
 
 ```bash
-# Run regression tests
-node tests/regression/test-regression.js
-
-# Generate baseline output
-node tests/regression/generate-golden-masters.js
-
-# Run UI tests in browser
-open tests/regression/test-ui-integration.html
+git clone https://github.com/fireplacetv/cut-ups.git
+cd cut-ups
+# Open src/index.html in your browser
 ```
 
-See `tests/TESTING.md` for detailed testing documentation.
+No build process or dependencies required. This is pure HTML, CSS, and vanilla JavaScript.
 
 ## Project Structure
 
@@ -70,77 +93,70 @@ tests/                      # Test suites
 └── README-TESTING-SETUP.md # Quick start for testing
 ```
 
-## Development
+## Technical Details
 
-### File Organization
+The application implements each cut-up algorithm in JavaScript:
 
-- **src/cutup.js** - Core algorithms (pure functions)
-- **src/index.html** - Web UI and DOM interaction
-- **src/style.css** - Visual styling
+- **Tokenization**: Text is split into units (words, lines, sentences, or 2D grid)
+- **Shuffling**: Units are randomly rearranged using Fisher-Yates shuffle
+- **Reassembly**: Units are rejoined with appropriate delimiters
+- **Smart Wrapping**: Text is re-wrapped to the specified width after cutting
 
-### Making Changes
+Each method produces different results on the same input, and running a method multiple times on its own output creates new variations.
 
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Make changes and test: `node tests/regression/test-regression.js`
-3. Commit and push: `git push -u origin feature/your-feature`
-4. Open a PR with test results
+## Philosophy
 
-### Code Review Focus
+This tool is both a tribute to the original cut-up artists and an exploration of how algorithmic randomness can reveal unexpected patterns in language. As Burroughs himself wrote: "The cut-up method is a way of letting the future in."
 
-- Data preservation (word/line/sentence counts)
-- Edge case handling (empty input, single tokens)
-- Performance (especially for large texts)
-- Consistency across methods
+## Development & Contributing
 
-## Testing Strategy
+### For Contributors
 
-This project uses a comprehensive multi-layer testing approach:
+1. **Run tests before submitting PRs:**
+   ```bash
+   cd tests/regression
+   node test-regression.js
+   ```
 
-1. **Regression Tests** - Validate core logic
-2. **Golden Masters** - Compare outputs against baseline
-3. **UI Integration** - Test browser interactions
-4. **Manual Verification** - Visual inspection in browser
+2. **Generate golden master baseline for refactoring:**
+   ```bash
+   cd tests/regression
+   node generate-golden-masters.js
+   cp golden-masters.json golden-masters.json.baseline
+   ```
 
-Before any refactoring:
-```bash
-node tests/regression/generate-golden-masters.js
-cp golden-masters.json golden-masters.json.baseline
-```
+3. **Key requirements:**
+   - Data preservation (word/line/sentence counts)
+   - Edge case handling (empty input, single tokens)
+   - All regression tests must pass
+   - Document algorithm changes clearly
 
-After changes:
-```bash
-node tests/regression/test-regression.js
-diff golden-masters.json.baseline golden-masters.json
-```
+### Testing Framework
 
-## Known Issues
+Comprehensive multi-layer testing ensures code safety:
+- **Regression Tests** (`tests/regression/test-regression.js`) - Unit tests for core logic
+- **Golden Masters** - Baseline output comparison for refactoring safety
+- **UI Integration Tests** (`tests/regression/test-ui-integration.html`) - Browser-based tests
+- See `tests/TESTING.md` for detailed testing guide
 
-- **Quadrant method data loss** - Currently losing words during transformation (tracked in PR #3)
+### Known Issues
 
-## Contributing
+- **Quadrant method**: Currently losing words during transformation (will be fixed in upcoming release)
 
-1. Ensure all tests pass: `node tests/regression/test-regression.js`
-2. Maintain data preservation across all methods
-3. Update tests when adding new methods
-4. Document algorithm changes clearly
+## Inspiration & Credits
 
-## Technology Stack
-
-- **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3
-- **Testing:** Node.js, Browser APIs
-- **Version Control:** Git + GitHub
+- **Brion Gysin** – Originator of the cut-up technique
+- **William S. Burroughs** – Pioneering practitioner and theorist
+- **Joe Dalton** – Collaborator who documented and refined the techniques
 
 ## License
 
-MIT
+This project is open source. Feel free to fork, modify, and use for your own creative projects.
 
-## Resources
+## Feedback
 
-- [William S. Burroughs on Cut-Ups](https://en.wikipedia.org/wiki/Cut-up_technique)
-- [Brion Gysin](https://en.wikipedia.org/wiki/Brion_Gysin)
-- [Help Documentation](docs/help.html) - In-app guide to methods
+Found a bug? Have ideas for improvements? Feel free to open an issue on the [GitHub repository](https://github.com/fireplacetv/cut-ups/issues).
 
 ---
 
-**Status:** Under active development with comprehensive testing framework  
-**Latest:** Testing framework (PR #3) adds regression tests and CI support
+**Status:** Under active development with comprehensive testing framework

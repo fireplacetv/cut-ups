@@ -7,160 +7,59 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Cut-Up Text Generator <button id="helpToggle" style="float: right; padding: 8px 16px; font-size: 0.9rem; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">Help</button></h1>
-
-  <div class="container">
-    <div class="panel">
-      <label for="input">Paste your text:</label>
-      <textarea id="input" placeholder="Enter or paste text here..."></textarea>
+  <header class="app-header">
+    <div class="header-content">
+      <div>
+        <h1>Cut-Up Text Generator</h1>
+        <p class="tagline">Apply Burroughs & Gysin techniques to your text</p>
+      </div>
+      <button id="helpToggle" class="help-btn" aria-label="Toggle help panel">
+        <span>?</span>
+        <span class="help-label">Help</span>
+      </button>
     </div>
+  </header>
 
-    <div class="panel">
-      <label for="output">Cut-up result:</label>
-      <div id="output"></div>
-    </div>
-  </div>
-
-  <div class="controls">
-    <div>
-      <label for="method">Method:</label>
-      <select id="method">
-        <option value="quadrant">Quadrant Cut</option>
-        <option value="fold-in">Fold-In</option>
-        <option value="line-shuffle">Line Shuffle</option>
-        <option value="sentence-shuffle">Sentence Shuffle</option>
-        <option value="word-scramble">Word Scramble</option>
-      </select>
-    </div>
-
-    <div class="button-row">
-      <button id="cutBtn">Cut Up Input</button>
-      <button id="cutOutputBtn">Cut Up Output</button>
-      <button id="copyBtn">Copy Result</button>
-    </div>
-  </div>
-
-  <div id="helpPanel" style="display: none; margin-top: 40px; padding: 20px; background: #f5f5f5; border-radius: 4px; border-left: 4px solid #333;">
-    <h2>About Cut-Up Techniques</h2>
-    <p>
-      The cut-up technique was pioneered by Brion Gysin and popularized by William S. Burroughs.
-      It involves physically cutting a text into pieces and rearranging them to create new, often surreal,
-      combinations. This app applies these techniques digitally using only words, lines, or sentences from your input.
-    </p>
-
-    <div class="method-help">
-      <h3>Quadrant Cut (2D)</h3>
-      <p>
-        <strong>How it works:</strong> The true Burroughs method: wraps your text into a 2D grid, makes a horizontal cut through the middle and a vertical cut through the middle, creating 4 quadrants. Then randomly shuffles the 4 quadrants and reassembles them. This is faithful to Burroughs's original physical technique with scissors and tape.
-      </p>
-      <p><strong>Example (80 char width):</strong></p>
-      <div class="example">
-        <div><strong>Input:</strong>
-          <pre>The cat sat on the mat and slept all day
-long in the sun by the window sill
-The dog ran in the park with friends and
-played fetch all day until sunset</pre>
+  <main class="app-main">
+    <div class="controls-panel">
+      <div class="control-section">
+        <label>Technique:</label>
+        <div class="method-buttons">
+          <button class="btn btn-method" data-method="quadrant" title="Wraps text into a 2D grid and shuffles the 4 quadrants">
+            <svg viewBox="0 0 16 16" class="method-icon"><rect x="1" y="1" width="6" height="6" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="1" width="6" height="6" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="9" width="6" height="6" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="6" height="6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            Quadrant
+          </button>
+          <button class="btn btn-method" data-method="fold-in" title="Splits text by lines and interleaves them together">
+            <svg viewBox="0 0 16 16" class="method-icon"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="5" x2="6" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="10" y1="5" x2="14" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="8" x2="6" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="10" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="11" x2="6" y2="11" stroke="currentColor" stroke-width="1.5"/><line x1="10" y1="11" x2="14" y2="11" stroke="currentColor" stroke-width="1.5"/></svg>
+            Fold-In
+          </button>
+          <button class="btn btn-method" data-method="line-shuffle" title="Cuts text into lines and randomly shuffles them">
+            <svg viewBox="0 0 16 16" class="method-icon"><line x1="2" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="1.5"/></svg>
+            Lines
+          </button>
+          <button class="btn btn-method" data-method="sentence-shuffle" title="Cuts text into sentences and randomly shuffles them">
+            <svg viewBox="0 0 16 16" class="method-icon"><line x1="2" y1="4" x2="14" y2="4" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="13" x2="10" y2="13" stroke="currentColor" stroke-width="1.5"/></svg>
+            Sentences
+          </button>
+          <button class="btn btn-method" data-method="word-scramble" title="Cuts text into words and randomly shuffles them">
+            <svg viewBox="0 0 16 16" class="method-icon"><text x="2" y="6" font-size="4" font-weight="bold" fill="currentColor">A</text><text x="7" y="10" font-size="4" font-weight="bold" fill="currentColor">B</text><text x="12" y="5" font-size="4" font-weight="bold" fill="currentColor">C</text><text x="3" y="13" font-size="4" font-weight="bold" fill="currentColor">D</text><text x="10" y="12" font-size="4" font-weight="bold" fill="currentColor">E</text></svg>
+            Words
+          </button>
         </div>
-        <div><strong>Output (quadrants shuffled):</strong>
-          <pre>played fetch all day until sunset
-The dog ran in the park with friends and
-The cat sat on the mat and slept all day
-long in the sun by the window sill</pre>
-        </div>
+      </div>
+
+      <div class="control-section">
+        <label for="widthSlider">Line width: <span id="widthValue">80</span>ch</label>
+        <input type="range" id="widthSlider" min="40" max="120" value="80" step="1" class="width-slider">
       </div>
     </div>
 
-    <div class="method-help">
-      <h3>Fold-In</h3>
-      <p>
-        <strong>How it works:</strong> Splits the text in half by lines, then interleaves them—alternating lines from the first half and second half.
-        This mimics Gysin's original fold-in technique where you'd fold a page in half and read across the seam.
-      </p>
-      <p><strong>Example:</strong></p>
-      <div class="example">
-        <div><strong>Input (6 lines):</strong>
-          <pre>Line 1
-Line 2
-Line 3
----
-Line 4
-Line 5
-Line 6</pre>
-        </div>
-        <div><strong>Output (interleaved):</strong>
-          <pre>Line 1
-Line 4
-Line 2
-Line 5
-Line 3
-Line 6</pre>
-        </div>
-      </div>
+    <div class="input-panel panel">
+      <label for="input">Your text:</label>
+      <textarea id="input" placeholder="Paste your source text here..."></textarea>
     </div>
+  </main>
 
-    <div class="method-help">
-      <h3>Line Shuffle</h3>
-      <p>
-        <strong>How it works:</strong> Cuts your text into individual lines and randomly shuffles them.
-        A looser technique that destroys paragraph structure while keeping each line intact.
-      </p>
-      <p><strong>Example:</strong></p>
-      <div class="example">
-        <div><strong>Input:</strong>
-          <pre>The cat sat on the mat.
-The dog ran in the park.
-The bird flew in the sky.</pre>
-        </div>
-        <div><strong>Output (lines shuffled):</strong>
-          <pre>The bird flew in the sky.
-The cat sat on the mat.
-The dog ran in the park.</pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="method-help">
-      <h3>Sentence Shuffle</h3>
-      <p>
-        <strong>How it works:</strong> Cuts your text into sentences (split on . ! ?) and randomly shuffles them.
-        Preserves more grammatical structure than line shuffle while still creating unexpected juxtapositions.
-      </p>
-      <p><strong>Example:</strong></p>
-      <div class="example">
-        <div><strong>Input:</strong>
-          <pre>The cat sat. The dog ran. The bird flew.</pre>
-        </div>
-        <div><strong>Output (sentences shuffled):</strong>
-          <pre>The dog ran. The bird flew. The cat sat.</pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="method-help">
-      <h3>Word Scramble</h3>
-      <p>
-        <strong>How it works:</strong> Cuts your text into individual words and randomly shuffles them.
-        The most extreme technique—destroys grammar and word order, often creating pure chaos or unexpected poetry.
-        This is similar to techniques Burroughs used in his most experimental work.
-      </p>
-      <p><strong>Example:</strong></p>
-      <div class="example">
-        <div><strong>Input:</strong>
-          <pre>The cat sat on the mat</pre>
-        </div>
-        <div><strong>Output (words scrambled):</strong>
-          <pre>mat on The cat the sat</pre>
-        </div>
-      </div>
-    </div>
-
-    <h3>Tips for Experimentation</h3>
-    <ul>
-      <li><strong>Layer techniques:</strong> Use "Cut Up Output" to apply different methods sequentially. Word Scramble → Sentence Shuffle can create interesting effects.</li>
-      <li><strong>Try different source texts:</strong> Poetry works well, but try prose, lists, or even mixed media (recipes, instructions, song lyrics).</li>
-      <li><strong>Embrace chance:</strong> The unexpected juxtapositions are the point. Keep clicking to explore different cuts.</li>
-    </ul>
-  </div>
 
   <script>
     function tokenize(text, unit, pageWidth = 80) {
@@ -294,6 +193,33 @@ The dog ran in the park.</pre>
       }
     }
 
+    function smartWrap(text, width) {
+      if (!text || width <= 0) return text;
+
+      const lines = text.split('\n');
+      return lines.map(line => {
+        if (line.length <= width) return line;
+
+        const words = line.split(' ');
+        const wrappedLines = [];
+        let currentLine = '';
+
+        for (const word of words) {
+          if (currentLine.length === 0) {
+            currentLine = word;
+          } else if ((currentLine + ' ' + word).length <= width) {
+            currentLine += ' ' + word;
+          } else {
+            if (currentLine) wrappedLines.push(currentLine);
+            currentLine = word;
+          }
+        }
+
+        if (currentLine) wrappedLines.push(currentLine);
+        return wrappedLines.join('\n');
+      }).join('\n');
+    }
+
     function cutUp(text, method, options = {}) {
       const { pageWidth = 80 } = options;
 
@@ -348,59 +274,35 @@ The dog ran in the park.</pre>
     }
 
     const inputEl = document.getElementById('input');
-    const outputEl = document.getElementById('output');
-    const methodEl = document.getElementById('method');
-    const cutBtn = document.getElementById('cutBtn');
-    const cutOutputBtn = document.getElementById('cutOutputBtn');
-    const copyBtn = document.getElementById('copyBtn');
-    const helpToggle = document.getElementById('helpToggle');
-    const helpPanel = document.getElementById('helpPanel');
+    const methodButtons = document.querySelectorAll('.btn-method');
+    const widthSlider = document.getElementById('widthSlider');
+    const widthValue = document.getElementById('widthValue');
+
+    let selectedMethod = 'quadrant';
+    let selectedWidth = 80;
 
     function performCutUp() {
       const text = inputEl.value;
-      const method = methodEl.value;
-
-      const result = cutUp(text, method, { pageWidth: 80 });
-      outputEl.textContent = result;
-    }
-
-    methodEl.addEventListener('change', () => {
-      toggleSegmentControl();
-    });
-
-    cutBtn.addEventListener('click', performCutUp);
-
-    cutOutputBtn.addEventListener('click', () => {
-      const text = outputEl.textContent;
-      if (!text) {
-        alert('No output to cut up. Generate a cut-up first.');
+      if (!text.trim()) {
         return;
       }
-      const method = methodEl.value;
 
-      const result = cutUp(text, method, { pageWidth: 80 });
-      outputEl.textContent = result;
+      const result = cutUp(text, selectedMethod, { pageWidth: selectedWidth });
+      const wrapped = smartWrap(result, selectedWidth);
+      inputEl.value = wrapped;
+    }
+
+    methodButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedMethod = btn.dataset.method;
+        performCutUp();
+      });
     });
 
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(outputEl.textContent);
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => {
-          copyBtn.textContent = originalText;
-        }, 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
-        copyBtn.textContent = 'Copy failed';
-        setTimeout(() => {
-          copyBtn.textContent = 'Copy Result';
-        }, 2000);
-      }
-    });
-
-    helpToggle.addEventListener('click', () => {
-      helpPanel.style.display = helpPanel.style.display === 'none' ? 'block' : 'none';
+    widthSlider.addEventListener('input', () => {
+      selectedWidth = parseInt(widthSlider.value);
+      widthValue.textContent = selectedWidth;
+      performCutUp();
     });
   </script>
 </body>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cut-Up Techniques - Help</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div>
+        <h1>Cut-Up Techniques</h1>
+        <p class="tagline">Learn about cut-up methods</p>
+      </div>
+      <a href="index.html" class="help-btn">← Back</a>
+    </div>
+  </header>
+
+  <main class="help-content">
+    <h2>About Cut-Up Techniques</h2>
+    <p>
+      The cut-up technique was pioneered by Brion Gysin and popularized by William S. Burroughs.
+      It involves physically cutting a text into pieces and rearranging them to create new, often surreal,
+      combinations. This app applies these techniques digitally using only words, lines, or sentences from your input.
+    </p>
+
+    <div class="method-help">
+      <h3>Quadrant Cut (2D)</h3>
+      <p>
+        <strong>How it works:</strong> The true Burroughs method: wraps your text into a 2D grid, makes a horizontal cut through the middle and a vertical cut through the middle, creating 4 quadrants. Then randomly shuffles the 4 quadrants and reassembles them. This is faithful to Burroughs's original physical technique with scissors and tape.
+      </p>
+      <p><strong>Example (80 char width):</strong></p>
+      <div class="example">
+        <div><strong>Input:</strong>
+          <pre>The cat sat on the mat and slept all day
+long in the sun by the window sill
+The dog ran in the park with friends and
+played fetch all day until sunset</pre>
+        </div>
+        <div><strong>Output (quadrants shuffled):</strong>
+          <pre>played fetch all day until sunset
+The dog ran in the park with friends and
+The cat sat on the mat and slept all day
+long in the sun by the window sill</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="method-help">
+      <h3>Fold-In</h3>
+      <p>
+        <strong>How it works:</strong> Splits the text in half by lines, then interleaves them—alternating lines from the first half and second half.
+        This mimics Gysin's original fold-in technique where you'd fold a page in half and read across the seam.
+      </p>
+      <p><strong>Example:</strong></p>
+      <div class="example">
+        <div><strong>Input (6 lines):</strong>
+          <pre>Line 1
+Line 2
+Line 3
+---
+Line 4
+Line 5
+Line 6</pre>
+        </div>
+        <div><strong>Output (interleaved):</strong>
+          <pre>Line 1
+Line 4
+Line 2
+Line 5
+Line 3
+Line 6</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="method-help">
+      <h3>Line Shuffle</h3>
+      <p>
+        <strong>How it works:</strong> Cuts your text into individual lines and randomly shuffles them.
+        A looser technique that destroys paragraph structure while keeping each line intact.
+      </p>
+      <p><strong>Example:</strong></p>
+      <div class="example">
+        <div><strong>Input:</strong>
+          <pre>The cat sat on the mat.
+The dog ran in the park.
+The bird flew in the sky.</pre>
+        </div>
+        <div><strong>Output (lines shuffled):</strong>
+          <pre>The bird flew in the sky.
+The cat sat on the mat.
+The dog ran in the park.</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="method-help">
+      <h3>Sentence Shuffle</h3>
+      <p>
+        <strong>How it works:</strong> Cuts your text into sentences (split on . ! ?) and randomly shuffles them.
+        Preserves more grammatical structure than line shuffle while still creating unexpected juxtapositions.
+      </p>
+      <p><strong>Example:</strong></p>
+      <div class="example">
+        <div><strong>Input:</strong>
+          <pre>The cat sat. The dog ran. The bird flew.</pre>
+        </div>
+        <div><strong>Output (sentences shuffled):</strong>
+          <pre>The dog ran. The bird flew. The cat sat.</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="method-help">
+      <h3>Word Scramble</h3>
+      <p>
+        <strong>How it works:</strong> Cuts your text into individual words and randomly shuffles them.
+        The most extreme technique—destroys grammar and word order, often creating pure chaos or unexpected poetry.
+        This is similar to techniques Burroughs used in his most experimental work.
+      </p>
+      <p><strong>Example:</strong></p>
+      <div class="example">
+        <div><strong>Input:</strong>
+          <pre>The cat sat on the mat</pre>
+        </div>
+        <div><strong>Output (words scrambled):</strong>
+          <pre>mat on The cat the sat</pre>
+        </div>
+      </div>
+    </div>
+
+    <h3>Tips for Experimentation</h3>
+    <ul>
+      <li><strong>Layer techniques:</strong> Use "Use Result" to load output back into input and apply different methods sequentially. Word Scramble → Sentence Shuffle can create interesting effects.</li>
+      <li><strong>Try different source texts:</strong> Poetry works well, but try prose, lists, or even mixed media (recipes, instructions, song lyrics).</li>
+      <li><strong>Adjust line width:</strong> Experiment with different character widths to see how the cut-up changes with different text layouts.</li>
+      <li><strong>Embrace chance:</strong> The unexpected juxtapositions are the point. Keep clicking to explore different cuts.</li>
+    </ul>
+  </main>
+
+  <style>
+    .help-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .help-content h2 {
+      margin-top: 0;
+    }
+  </style>
+</body>
+</html>
