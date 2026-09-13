@@ -309,9 +309,20 @@ textarea:focus {
 .controls-panel .control-section:last-child {
   flex: 1;
   display: flex;
-  gap: 8px;
+  flex-direction: row;
+  gap: 12px;
   justify-content: flex-end;
-  align-items: flex-end;
+  align-items: center;
+}
+
+.width-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
 }
 
 /* Help content page */
@@ -423,6 +434,18 @@ textarea:focus {
 
   .method-buttons {
     grid-template-columns: 1fr;
+  }
+
+  .controls-panel {
+    flex-wrap: wrap;
+  }
+
+  .controls-panel .control-section:last-child {
+    justify-content: flex-start;
+  }
+
+  .width-group {
+    flex-wrap: wrap;
   }
 
   .input-panel {
