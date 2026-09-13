@@ -230,8 +230,11 @@ function cutUp(text, method, options = {}) {
 }
 
 /**
- * Word-wraps each line of text to a maximum width without breaking words
- * mid-word. Lines already within width are left untouched.
+ * Word-wraps text to a maximum width without breaking words mid-word.
+ * Within a paragraph, existing line breaks are treated as soft and words
+ * are reflowed freely, so narrow lines get combined into wider ones as
+ * well as wide lines split into narrower ones. Double line breaks are
+ * treated as paragraph boundaries and are never joined across.
  * @param {string} text
  * @param {number} width - Max characters per output line.
  * @returns {string} Re-wrapped text; returned as-is if width <= 0 or text is empty.
@@ -239,11 +242,12 @@ function cutUp(text, method, options = {}) {
 function smartWrap(text, width) {
   if (!text || width <= 0) return text;
 
-  const lines = text.split('\n');
-  return lines.map(line => {
-    if (line.length <= width) return line;
+  const paragraphs = text.split(/\n{2,}/);
 
-    const words = line.split(' ');
+  const wrappedParagraphs = paragraphs.map(paragraph => {
+    const words = paragraph.split(/\s+/).filter(word => word.length > 0);
+    if (words.length === 0) return paragraph;
+
     const wrappedLines = [];
     let currentLine = '';
 
@@ -253,14 +257,16 @@ function smartWrap(text, width) {
       } else if ((currentLine + ' ' + word).length <= width) {
         currentLine += ' ' + word;
       } else {
-        if (currentLine) wrappedLines.push(currentLine);
+        wrappedLines.push(currentLine);
         currentLine = word;
       }
     }
 
     if (currentLine) wrappedLines.push(currentLine);
     return wrappedLines.join('\n');
-  }).join('\n');
+  });
+
+  return wrappedParagraphs.join('\n\n');
 }
 
 export { cutUp, tokenize, smartWrap, reassemble };
