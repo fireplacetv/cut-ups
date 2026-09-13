@@ -1,5 +1,5 @@
 import { cutUp, smartWrap, cleanWhitespace } from './cutup.js';
-import { DEFAULT_LINE_WIDTH, WIDTH_SLIDER_MIN, WIDTH_SLIDER_MAX, WIDTH_SLIDER_STEP } from './constants.js';
+import { DEFAULT_LINE_WIDTH, WIDTH_SLIDER_MIN, WIDTH_SLIDER_MAX, WIDTH_SLIDER_STEP, DEFAULT_INPUT_TEXT } from './constants.js';
 import { getSelectedMethod, setSelectedMethod, getSelectedWidth, setSelectedWidth } from './state.js';
 
 /**
@@ -23,6 +23,11 @@ export function initializeUI() {
   // Set slider to initial width
   widthSlider.value = initialWidth;
   widthValue.textContent = initialWidth;
+
+  // Preload sample text so first-time users have something to cut up.
+  if (!inputEl.value) {
+    inputEl.value = DEFAULT_INPUT_TEXT;
+  }
 
   // Applies the currently selected method to the input textarea in place.
   // Errors are logged rather than thrown so a bad transform doesn't leave
