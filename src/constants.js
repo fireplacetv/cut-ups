@@ -22,9 +22,9 @@ export const METHOD_TO_UNIT = {
 export const METHODS = ['quadrant', 'fold-in', 'line-shuffle', 'sentence-shuffle', 'word-scramble'];
 
 // Placeholder text preloaded into the input textarea so first-time users
-// have something to cut up immediately.
-export const DEFAULT_INPUT_TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+// have something to cut up immediately. Pulled from the README's
+// introduction (rather than lorem ipsum) so the effect of each technique
+// is legible in English from the start.
+export const DEFAULT_INPUT_TEXT = `The cut-up technique is a literary and visual art method where text is physically or digitally cut into pieces and rearranged to create new, often surreal, combinations. Rather than being a random scramble, it's a deliberate method of discovering unexpected connections and meanings within language.
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.`;
+Brion Gysin, an American painter and writer, pioneered the technique in the 1950s. William S. Burroughs adopted and popularized it, using it as a core element of his literary practice. He believed cut-ups could reveal hidden meanings and bypass the logical mind.`;
