@@ -23,8 +23,8 @@ body {
   color: var(--text);
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Header */
@@ -98,8 +98,6 @@ body {
   flex-direction: column;
   gap: 20px;
   flex: 1;
-  overflow-y: auto;
-  order: 2;
 }
 
 /* Panels */
