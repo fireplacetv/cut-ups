@@ -1,4 +1,6 @@
-function tokenize(text, unit, segmentCount = 4) {
+import { DEFAULT_LINE_WIDTH, METHOD_TO_UNIT } from './constants.js';
+
+function tokenize(text, unit) {
   if (!text || !text.trim()) {
     return [];
   }
@@ -27,16 +29,6 @@ function tokenize(text, unit, segmentCount = 4) {
       return sentences.filter(s => s.length > 0);
     }
 
-    case 'segment': {
-      if (segmentCount < 2) return [text];
-      const chunkSize = Math.ceil(text.length / segmentCount);
-      const segments = [];
-      for (let i = 0; i < text.length; i += chunkSize) {
-        segments.push(text.slice(i, i + chunkSize));
-      }
-      return segments;
-    }
-
     default:
       return [text];
   }
@@ -51,7 +43,7 @@ function shuffle(chunks) {
   return arr;
 }
 
-function quadrantCut2D(lines, pageWidth = 80) {
+function quadrantCut2D(lines, pageWidth) {
   if (lines.length < 2) return lines;
 
   const midRow = Math.floor(lines.length / 2);
@@ -116,7 +108,7 @@ function foldIn(chunks) {
   return result;
 }
 
-function join(chunks, unit) {
+function reassemble(chunks, unit) {
   if (chunks.length === 0) return '';
 
   switch (unit) {
@@ -134,7 +126,7 @@ function join(chunks, unit) {
 }
 
 function cutUp(text, method, options = {}) {
-  const { pageWidth = 80 } = options;
+  const { pageWidth = DEFAULT_LINE_WIDTH } = options;
 
   if (!text || !text.trim()) {
     return text;
@@ -149,22 +141,9 @@ function cutUp(text, method, options = {}) {
     return quadrantCut2D(lines, pageWidth);
   }
 
-  let unit;
-  switch (method) {
-    case 'fold-in':
-      unit = 'line';
-      break;
-    case 'line-shuffle':
-      unit = 'line';
-      break;
-    case 'sentence-shuffle':
-      unit = 'sentence';
-      break;
-    case 'word-scramble':
-      unit = 'word';
-      break;
-    default:
-      return text;
+  const unit = METHOD_TO_UNIT[method];
+  if (!unit) {
+    return text;
   }
 
   let chunks = tokenize(text, unit);
@@ -187,7 +166,7 @@ function cutUp(text, method, options = {}) {
       result = chunks;
   }
 
-  return join(result, unit);
+  return reassemble(result, unit);
 }
 
 function smartWrap(text, width) {
@@ -217,4 +196,4 @@ function smartWrap(text, width) {
   }).join('\n');
 }
 
-export { cutUp, tokenize, smartWrap };
+export { cutUp, tokenize, smartWrap, reassemble };
