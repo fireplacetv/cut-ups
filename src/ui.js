@@ -1,4 +1,4 @@
-import { cutUp, smartWrap } from './cutup.js';
+import { cutUp, smartWrap, cleanWhitespace } from './cutup.js';
 import { DEFAULT_LINE_WIDTH, WIDTH_SLIDER_MIN, WIDTH_SLIDER_MAX, WIDTH_SLIDER_STEP } from './constants.js';
 import { getSelectedMethod, setSelectedMethod, getSelectedWidth, setSelectedWidth } from './state.js';
 
@@ -28,6 +28,7 @@ export function initializeUI() {
   const widthSlider = document.getElementById('widthSlider');
   const widthValue = document.getElementById('widthValue');
   const wrapButton = document.getElementById('wrapButton');
+  const cleanWhitespaceButton = document.getElementById('cleanWhitespaceButton');
 
   // Initialize state
   const initialMethod = getSelectedMethod();
@@ -67,6 +68,17 @@ export function initializeUI() {
     inputEl.value = smartWrap(text, getSelectedWidth());
   }
 
+  // Cleans up sparse/ragged whitespace (e.g. after quadrant or shuffle
+  // methods) in the input textarea, in place.
+  function performCleanWhitespace() {
+    const text = inputEl.value;
+    if (!text.trim()) {
+      return;
+    }
+
+    inputEl.value = cleanWhitespace(text, getSelectedWidth());
+  }
+
   methodButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const method = btn.dataset.method;
@@ -83,4 +95,5 @@ export function initializeUI() {
   });
 
   wrapButton.addEventListener('click', performWrap);
+  cleanWhitespaceButton.addEventListener('click', performCleanWhitespace);
 }

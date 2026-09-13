@@ -1,4 +1,4 @@
-import { cutUp, tokenize } from '../../src/cutup.js';
+import { cutUp, tokenize, cleanWhitespace } from '../../src/cutup.js';
 
 // Each case exercises one method against the invariants documented in
 // CLAUDE.md ("Key Invariants"): word/sentence count preservation, and
@@ -131,11 +131,104 @@ function runRegressionTests() {
   return failed === 0;
 }
 
-export { runRegressionTests };
+// Cases for cleanWhitespace(), exercised separately from the cutUp() suite
+// above since it isn't a cut-up method. Each case supplies a custom
+// `check(result)` that throws on failure, mirroring the invariant checks
+// used for cutUp() cases.
+const cleanWhitespaceTestCases = [
+  {
+    name: 'collapses wide gaps between words',
+    input: 'The     quick   brown      fox',
+    width: 80,
+    check: result => {
+      if (result !== 'The quick brown fox') {
+        throw new Error(`Expected gaps collapsed, got: "${result}"`);
+      }
+    },
+  },
+  {
+    name: 'caps runs of 3+ linebreaks at 2',
+    input: 'First paragraph.\n\n\n\n\nSecond paragraph.',
+    width: 80,
+    check: result => {
+      if (result !== 'First paragraph.\n\nSecond paragraph.') {
+        throw new Error(`Expected linebreaks capped at 2, got: "${result}"`);
+      }
+    },
+  },
+  {
+    name: 'preserves a single paragraph break',
+    input: 'First paragraph text here.\n\nSecond paragraph text here.',
+    width: 80,
+    check: result => {
+      const breaks = result.match(/\n{2,}/g) || [];
+      if (breaks.length !== 1 || breaks[0] !== '\n\n') {
+        throw new Error(`Expected exactly one "\\n\\n" break, got: "${result}"`);
+      }
+    },
+  },
+  {
+    name: 'preserves word count',
+    input: 'alpha    beta\ngamma\n\n\ndelta      epsilon',
+    width: 80,
+    check: result => {
+      const inputWords = countWords('alpha beta gamma delta epsilon');
+      const resultWords = countWords(result);
+      if (resultWords !== inputWords) {
+        throw new Error(`Word count mismatch: expected ${inputWords}, got ${resultWords}`);
+      }
+    },
+  },
+  {
+    name: 'empty input returns empty',
+    input: '',
+    width: 80,
+    check: result => {
+      if (result !== '') {
+        throw new Error(`Expected empty output, got: "${result}"`);
+      }
+    },
+  },
+];
+
+/**
+ * Runs all cleanWhitespaceTestCases against cleanWhitespace() and logs
+ * pass/fail per case plus a summary.
+ * @returns {boolean} True if every test case passed.
+ */
+function runCleanWhitespaceTests() {
+  console.log('\n=== CLEAN WHITESPACE TESTS ===\n');
+
+  let passed = 0;
+  let failed = 0;
+
+  cleanWhitespaceTestCases.forEach(test => {
+    try {
+      const result = cleanWhitespace(test.input, test.width);
+      test.check(result);
+      console.log(`✓ PASS: ${test.name}`);
+      passed++;
+    } catch (err) {
+      console.log(`✗ FAIL: ${test.name}`);
+      console.log(`  Error: ${err.message}\n`);
+      failed++;
+    }
+  });
+
+  console.log(`\n=== SUMMARY ===`);
+  console.log(`Passed: ${passed}`);
+  console.log(`Failed: ${failed}`);
+  console.log(`Total: ${passed + failed}`);
+
+  return failed === 0;
+}
+
+export { runRegressionTests, runCleanWhitespaceTests };
 
 // Only auto-run when this file is executed directly (e.g. `node
 // test-regression.js`), not when imported by another test module.
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const success = runRegressionTests();
-  process.exit(success ? 0 : 1);
+  const regressionSuccess = runRegressionTests();
+  const cleanWhitespaceSuccess = runCleanWhitespaceTests();
+  process.exit(regressionSuccess && cleanWhitespaceSuccess ? 0 : 1);
 }
