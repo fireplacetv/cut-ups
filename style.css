@@ -315,19 +315,6 @@ textarea:focus {
   transform: translateY(0);
 }
 
-.btn-help-link {
-  display: inline-block;
-  background: var(--bg);
-  color: var(--primary);
-  border: 1px solid var(--primary);
-  text-align: center;
-  text-decoration: none;
-}
-
-.btn-help-link:hover {
-  background: var(--primary-light);
-}
-
 .controls-panel .control-section:last-child {
   flex: 1;
   display: flex;
