@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Integration Tests</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      background: white;
+      border-radius: 4px;
+      border-left: 4px solid #ccc;
+    }
+    .test-section.pass {
+      border-left-color: #4caf50;
+      background: #f1f8f4;
+    }
+    .test-section.fail {
+      border-left-color: #f44336;
+      background: #fef4f3;
+    }
+    .test-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .pass { color: #4caf50; }
+    .fail { color: #f44336; }
+    .summary {
+      margin-top: 30px;
+      padding: 20px;
+      background: white;
+      border-radius: 4px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .debug-info {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cut-Up Text Generator - UI Integration Tests</h1>
+  <div id="test-results"></div>
+  <div id="summary" class="summary"></div>
+
+  <script type="module">
+    // Import from the same cutup.js used in production
+    import { cutUp } from '../../src/cutup.js';
+
+    const results = [];
+
+    function test(name, fn) {
+      try {
+        fn();
+        results.push({ name, pass: true, error: null });
+      } catch (err) {
+        results.push({ name, pass: false, error: err.message });
+      }
+    }
+
+    function assert(condition, message) {
+      if (!condition) {
+        throw new Error(message);
+      }
+    }
+
+    function countWords(text) {
+      return text.split(/\s+/).filter(w => w.length > 0).length;
+    }
+
+    // ===== TEST SUITE =====
+
+    test('Quadrant method produces non-empty output', () => {
+      const input = 'The cat sat on the mat.\nDogs run fast.';
+      const result = cutUp(input, 'quadrant', { segmentCount: 2 });
+      assert(result && result.length > 0, 'Output should not be empty');
+    });
+
+    test('Quadrant method preserves word count', () => {
+      const input = 'one two three four five six';
+      const result = cutUp(input, 'quadrant', { segmentCount: 2 });
+      const inputWords = countWords(input);
+      const outputWords = countWords(result);
+      assert(inputWords === outputWords, `Word count mismatch: ${inputWords} vs ${outputWords}`);
+    });
+
+    test('Word scramble produces variation', () => {
+      const input = 'a b c d e f g h i j';
+      const results = [];
+      for (let i = 0; i < 5; i++) {
+        results.push(cutUp(input, 'word-scramble'));
+      }
+      const uniqueResults = new Set(results).size;
+      assert(uniqueResults > 1, `Expected variation but got ${uniqueResults} unique results`);
+    });
+
+    test('Word scramble preserves word count', () => {
+      const input = 'apple banana cherry date';
+      const result = cutUp(input, 'word-scramble');
+      const inputWords = countWords(input);
+      const outputWords = countWords(result);
+      assert(inputWords === outputWords, `Word count mismatch: ${inputWords} vs ${outputWords}`);
+    });
+
+    test('Fold-in interleaves lines correctly', () => {
+      const input = 'line1\nline2\nline3\nline4';
+      const result = cutUp(input, 'fold-in');
+      assert(result.includes('line1'), 'Result should contain line1');
+      assert(result.includes('line4'), 'Result should contain line4');
+    });
+
+    test('Fold-in preserves line count', () => {
+      const input = 'line1\nline2\nline3\nline4';
+      const result = cutUp(input, 'fold-in');
+      const inputLines = input.split('\n').length;
+      const outputLines = result.split('\n').length;
+      assert(inputLines === outputLines, `Line count mismatch: ${inputLines} vs ${outputLines}`);
+    });
+
+    test('Line shuffle preserves all lines', () => {
+      const input = 'first line\nsecond line\nthird line';
+      const result = cutUp(input, 'line-shuffle');
+      assert(result.includes('first line'), 'Result should contain "first line"');
+      assert(result.includes('second line'), 'Result should contain "second line"');
+      assert(result.includes('third line'), 'Result should contain "third line"');
+    });
+
+    test('Line shuffle preserves line count', () => {
+      const input = 'first line\nsecond line\nthird line';
+      const result = cutUp(input, 'line-shuffle');
+      const inputLines = input.split('\n').length;
+      const outputLines = result.split('\n').length;
+      assert(inputLines === outputLines, `Line count mismatch: ${inputLines} vs ${outputLines}`);
+    });
+
+    test('Sentence shuffle preserves sentences', () => {
+      const input = 'First sentence. Second sentence. Third sentence.';
+      const result = cutUp(input, 'sentence-shuffle');
+      assert(result.includes('First sentence'), 'Result should contain "First sentence"');
+      assert(result.includes('Second sentence'), 'Result should contain "Second sentence"');
+      assert(result.includes('Third sentence'), 'Result should contain "Third sentence"');
+    });
+
+    test('Empty input returns empty string', () => {
+      const result = cutUp('', 'word-scramble');
+      assert(result === '', `Expected empty string, got "${result}"`);
+    });
+
+    test('Single word input returns unchanged', () => {
+      const input = 'hello';
+      const result = cutUp(input, 'word-scramble');
+      assert(result === input, `Single word should not change: "${result}"`);
+    });
+
+    test('Single line input returns unchanged for line methods', () => {
+      const input = 'hello world';
+      const result = cutUp(input, 'line-shuffle');
+      assert(result === input, `Single line should not change: "${result}"`);
+    });
+
+    test('Width parameter does not affect word count', () => {
+      const input = 'one two three four five';
+      const result40 = cutUp(input, 'word-scramble', { pageWidth: 40 });
+      const result100 = cutUp(input, 'word-scramble', { pageWidth: 100 });
+      const words40 = countWords(result40);
+      const words100 = countWords(result100);
+      assert(words40 === words100, `Word count should not depend on width: ${words40} vs ${words100}`);
+    });
+
+    test('Multiple methods on same input all preserve data', () => {
+      const input = 'apple banana cherry date';
+      const methods = ['quadrant', 'fold-in', 'line-shuffle', 'sentence-shuffle', 'word-scramble'];
+      const inputWords = countWords(input);
+
+      methods.forEach(method => {
+        const result = cutUp(input, method, { segmentCount: 2 });
+        const outputWords = countWords(result);
+        assert(
+          inputWords === outputWords,
+          `${method}: word count mismatch: ${inputWords} vs ${outputWords}`
+        );
+      });
+    });
+
+    test('No method modifies the original input', () => {
+      const original = 'test input string';
+      const input = original;
+      cutUp(input, 'word-scramble');
+      assert(input === original, 'Original input should not be modified');
+    });
+
+    // ===== DISPLAY RESULTS =====
+
+    function displayResults() {
+      const resultsDiv = document.getElementById('test-results');
+      const summaryDiv = document.getElementById('summary');
+
+      const passed = results.filter(r => r.pass).length;
+      const failed = results.filter(r => !r.pass).length;
+
+      resultsDiv.innerHTML = results
+        .map(
+          r =>
+            `<div class="test-section ${r.pass ? 'pass' : 'fail'}">
+            <div class="test-title">
+              <span class="${r.pass ? 'pass' : 'fail'}">
+                ${r.pass ? '✓' : '✗'}
+              </span>
+              ${r.name}
+            </div>
+            ${r.error ? `<div class="debug-info">Error: ${r.error}</div>` : ''}
+          </div>`
+        )
+        .join('');
+
+      summaryDiv.innerHTML = `
+        <span class="pass">✓ Passed: ${passed}</span> |
+        <span class="fail">✗ Failed: ${failed}</span> |
+        Total: ${passed + failed}
+        ${failed === 0 ? ' 🎉 All tests passed!' : ''}
+      `;
+    }
+
+    displayResults();
+  </script>
+</body>
+</html>

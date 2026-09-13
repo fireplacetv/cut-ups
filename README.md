@@ -48,6 +48,7 @@ Cuts your text into individual words and randomly shuffles them. The most chaoti
 - **Help page** with detailed explanations and examples
 - **No installation needed** – runs entirely in your browser
 - **Responsive design** – works on desktop and mobile
+- **Comprehensive testing framework** – ensures quality and enables safe refactoring
 
 ## How to Use
 
@@ -64,18 +65,33 @@ If you want to run this locally or contribute:
 ```bash
 git clone https://github.com/fireplacetv/cut-ups.git
 cd cut-ups
-# Open index.html in your browser
+# Open src/index.html in your browser
 ```
 
 No build process or dependencies required. This is pure HTML, CSS, and vanilla JavaScript.
 
-## File Structure
+## Project Structure
 
-- `index.html` – Main application UI
-- `help.html` – Help page with technique explanations
-- `style.css` – Application styling
-- `cutup.js` – Cut-up algorithm implementations (core logic)
-- `test.js`, `test-simple.html` – Test files
+```
+src/                          # Application source code
+├── index.html               # Main web application
+├── cutup.js                # Core text transformation logic
+└── style.css               # Application styles
+
+docs/                       # Documentation
+├── help.html              # User guide and method explanations
+
+tests/                      # Test suites
+├── regression/            # Modern testing framework
+│   ├── test-regression.js
+│   ├── test-ui-integration.html
+│   └── generate-golden-masters.js
+├── legacy/                # Original tests (for reference)
+│   ├── test.js
+│   └── test-simple.html
+├── TESTING.md             # Detailed testing guide
+└── README-TESTING-SETUP.md # Quick start for testing
+```
 
 ## Technical Details
 
@@ -92,6 +108,41 @@ Each method produces different results on the same input, and running a method m
 
 This tool is both a tribute to the original cut-up artists and an exploration of how algorithmic randomness can reveal unexpected patterns in language. As Burroughs himself wrote: "The cut-up method is a way of letting the future in."
 
+## Development & Contributing
+
+### For Contributors
+
+1. **Run tests before submitting PRs:**
+   ```bash
+   cd tests/regression
+   node test-regression.js
+   ```
+
+2. **Generate golden master baseline for refactoring:**
+   ```bash
+   cd tests/regression
+   node generate-golden-masters.js
+   cp golden-masters.json golden-masters.json.baseline
+   ```
+
+3. **Key requirements:**
+   - Data preservation (word/line/sentence counts)
+   - Edge case handling (empty input, single tokens)
+   - All regression tests must pass
+   - Document algorithm changes clearly
+
+### Testing Framework
+
+Comprehensive multi-layer testing ensures code safety:
+- **Regression Tests** (`tests/regression/test-regression.js`) - Unit tests for core logic
+- **Golden Masters** - Baseline output comparison for refactoring safety
+- **UI Integration Tests** (`tests/regression/test-ui-integration.html`) - Browser-based tests
+- See `tests/TESTING.md` for detailed testing guide
+
+### Known Issues
+
+- **Quadrant method**: Currently losing words during transformation (will be fixed in upcoming release)
+
 ## Inspiration & Credits
 
 - **Brion Gysin** – Originator of the cut-up technique
@@ -102,6 +153,10 @@ This tool is both a tribute to the original cut-up artists and an exploration of
 
 This project is open source. Feel free to fork, modify, and use for your own creative projects.
 
-## Feedback & Contributing
+## Feedback
 
 Found a bug? Have ideas for improvements? Feel free to open an issue on the [GitHub repository](https://github.com/fireplacetv/cut-ups/issues).
+
+---
+
+**Status:** Under active development with comprehensive testing framework

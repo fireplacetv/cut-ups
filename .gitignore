@@ -1,0 +1,14 @@
+# Generated test artifacts
+tests/regression/golden-masters.json
+tests/regression/golden-masters.json.baseline
+tests/regression/golden-masters.json.gz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
