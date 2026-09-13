@@ -12,6 +12,8 @@ Brion Gysin, an American painter and writer, pioneered the technique in the 1950
 
 This web application brings these analog techniques into the digital age, allowing you to apply various cut-up methods to any text.
 
+Read more on [Wikipedia: Cut-up technique](https://en.wikipedia.org/wiki/Cut-up_technique).
+
 ## Available Techniques
 
 ### Quadrant Cut (2D)
