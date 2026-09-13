@@ -1,6 +1,7 @@
 import { cutUp, smartWrap, cleanWhitespace } from './cutup.js';
 import { DEFAULT_LINE_WIDTH, WIDTH_SLIDER_MIN, WIDTH_SLIDER_MAX, WIDTH_SLIDER_STEP, DEFAULT_INPUT_TEXT } from './constants.js';
 import { getSelectedMethod, setSelectedMethod, getSelectedWidth, setSelectedWidth } from './state.js';
+import { fetchRandomWikipediaText } from './wikipedia.js';
 
 /**
  * Wires up all DOM event listeners for the cut-up UI: method buttons,
@@ -15,6 +16,8 @@ export function initializeUI() {
   const widthValue = document.getElementById('widthValue');
   const wrapButton = document.getElementById('wrapButton');
   const cleanWhitespaceButton = document.getElementById('cleanWhitespaceButton');
+  const wikipediaButton = document.getElementById('wikipediaButton');
+  const wikipediaStatus = document.getElementById('wikipediaStatus');
   const helpToggle = document.getElementById('helpToggle');
 
   // Initialize state
@@ -67,6 +70,25 @@ export function initializeUI() {
     inputEl.value = cleanWhitespace(text, getSelectedWidth());
   }
 
+  // Fetches a random Wikipedia article, picks a random section (lead or a
+  // heading), and replaces the input textarea with it as fresh cut-up
+  // source material. Entirely client-side via Wikipedia's public API.
+  async function performInsertWikipedia() {
+    wikipediaButton.disabled = true;
+    wikipediaStatus.textContent = 'Loading random article…';
+
+    try {
+      const { text } = await fetchRandomWikipediaText();
+      inputEl.value = text;
+      wikipediaStatus.textContent = '';
+    } catch (error) {
+      console.error('Wikipedia fetch error:', error.message);
+      wikipediaStatus.textContent = 'Could not load a Wikipedia article. Try again.';
+    } finally {
+      wikipediaButton.disabled = false;
+    }
+  }
+
   methodButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const method = btn.dataset.method;
@@ -83,6 +105,7 @@ export function initializeUI() {
 
   wrapButton.addEventListener('click', performWrap);
   cleanWhitespaceButton.addEventListener('click', performCleanWhitespace);
+  wikipediaButton.addEventListener('click', performInsertWikipedia);
 
   helpToggle.addEventListener('click', () => {
     window.location.href = 'help.html';

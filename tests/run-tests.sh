@@ -29,6 +29,11 @@ echo "🧪 Running regression tests..."
 node test-regression.js
 echo ""
 
+# Run Wikipedia parsing tests
+echo "🧪 Running Wikipedia parsing tests..."
+node test-wikipedia.js
+echo ""
+
 # Print UI test instructions
 echo "🌐 UI Integration Tests:"
 echo "   From project root, run: python -m http.server 8000"

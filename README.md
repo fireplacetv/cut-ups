@@ -44,6 +44,7 @@ Cuts your text into individual words and randomly shuffles them. The most chaoti
 - **Five cut-up methods** to choose from
 - **Adjustable line width** (40-120 characters) used for quadrant cuts and standalone text wrapping
 - **Standalone "Wrap Text" tool** to reflow text at the chosen width, independent of any cut-up method
+- **Random Wikipedia article insert** – fetch a random Wikipedia article (via Wikipedia's public API, entirely client-side) and drop a random section of its text into the input as fresh source material
 - **In-place editing** – results appear directly in the text area
 - **Visual icons** for each technique
 - **Help page** with detailed explanations and examples
