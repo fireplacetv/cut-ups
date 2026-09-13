@@ -273,4 +273,21 @@ function smartWrap(text, width) {
   return wrappedParagraphs.join('\n\n');
 }
 
-export { cutUp, tokenize, smartWrap, reassemble };
+/**
+ * Cleans up sparse whitespace left behind by cut-up methods (e.g. quadrant's
+ * padded columns, or fold-in/shuffle runs producing ragged gaps between
+ * words). Recognizes double line breaks as paragraph boundaries, re-wraps
+ * the text with smartWrap (which collapses any run of whitespace between
+ * words down to a single space), then caps any remaining run of line
+ * breaks at 2 so paragraph breaks are preserved without letting blank
+ * lines pile up beyond that.
+ * @param {string} text
+ * @param {number} width - Max characters per line, passed through to smartWrap.
+ * @returns {string} Whitespace-normalized text; returned as-is if width <= 0 or text is empty.
+ */
+function cleanWhitespace(text, width) {
+  if (!text || width <= 0) return text;
+  return smartWrap(text, width).replace(/\n{3,}/g, '\n\n');
+}
+
+export { cutUp, tokenize, smartWrap, cleanWhitespace, reassemble };
