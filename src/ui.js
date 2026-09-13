@@ -3,20 +3,6 @@ import { DEFAULT_LINE_WIDTH, WIDTH_SLIDER_MIN, WIDTH_SLIDER_MAX, WIDTH_SLIDER_ST
 import { getSelectedMethod, setSelectedMethod, getSelectedWidth, setSelectedWidth } from './state.js';
 
 /**
- * Toggles the 'active' class and aria-pressed state on all method buttons
- * so only the button matching `method` (via its data-method attribute)
- * appears selected.
- * @param {string} method - The method that should be shown as active.
- */
-function updateActiveMethodButton(method) {
-  document.querySelectorAll('.btn-method').forEach(btn => {
-    const isActive = btn.dataset.method === method;
-    btn.classList.toggle('active', isActive);
-    btn.setAttribute('aria-pressed', isActive);
-  });
-}
-
-/**
  * Wires up all DOM event listeners for the cut-up UI: method buttons,
  * the width slider, and the wrap button. Reads/writes selection state via
  * state.js and delegates the actual text transforms to cutup.js. Call once
@@ -31,15 +17,11 @@ export function initializeUI() {
   const cleanWhitespaceButton = document.getElementById('cleanWhitespaceButton');
 
   // Initialize state
-  const initialMethod = getSelectedMethod();
   const initialWidth = getSelectedWidth();
 
   // Set slider to initial width
   widthSlider.value = initialWidth;
   widthValue.textContent = initialWidth;
-
-  // Show initial active method
-  updateActiveMethodButton(initialMethod);
 
   // Applies the currently selected method to the input textarea in place.
   // Errors are logged rather than thrown so a bad transform doesn't leave
@@ -83,7 +65,6 @@ export function initializeUI() {
     btn.addEventListener('click', () => {
       const method = btn.dataset.method;
       setSelectedMethod(method);
-      updateActiveMethodButton(method);
       performCutUp();
     });
   });
